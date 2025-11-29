@@ -18,10 +18,10 @@
 
 <label>Pilih Diamond</label><br>
 <select name="diamond">
-<option value="dm11">11 Diamonds</option>
-<option value="dm28">28 Diamonds</option>
-<option value="dm59">59 Diamonds</option>
-<option value="dm85">85 Diamonds</option>
+<option value="UPMBL5">5 Diamonds</option>
+<option value="UPMBL12">12 Diamonds</option>
+<option value="UPMBL19">19 Diamonds</option>
+<option value="UPMBL18">28 Diamonds</option>
 </select><br><br>
 
 
