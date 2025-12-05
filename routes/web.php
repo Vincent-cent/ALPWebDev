@@ -12,9 +12,11 @@ Route::get('/', function () {
 Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder']);
 
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/beranda', function () {
+    return view('beranda');
+})->middleware(['auth', 'verified'])->name('beranda');
+
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
