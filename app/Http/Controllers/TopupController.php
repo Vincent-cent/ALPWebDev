@@ -56,20 +56,14 @@ class TopupController extends Controller
         ]);
     }
 
-
-
-
-
     public function resellerCallback(Request $req)
     {
         $order = Order::where('order_id', $req->reference_id)->first();
 
         if (!$order) return response('Order Not Found', 404);
 
-
         $order->status = $req->status;
         $order->save();
-
 
         return response('OK', 200);
     }

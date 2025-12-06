@@ -8,5 +8,5 @@ Route::get('/', function () {
 });
 
 
-Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder']);
+Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder'] );
 
