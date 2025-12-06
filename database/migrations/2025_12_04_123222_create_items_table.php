@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
+
+            // 🔗 FK to game
+            $table->foreignId('game_id')
+                  ->constrained('games')
+                  ->cascadeOnDelete();
+
+            $table->string('name');                 // e.g., Diamonds, Subscription, Skin
+            $table->string('type')->nullable();     // optional type classification
+            $table->string('image')->nullable();    // card thumbnail
+
             $table->timestamps();
         });
     }

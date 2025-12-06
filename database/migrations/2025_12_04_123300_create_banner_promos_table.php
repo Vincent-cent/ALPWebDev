@@ -13,8 +13,20 @@ return new class extends Migration
     {
         Schema::create('banner_promos', function (Blueprint $table) {
             $table->id();
+
+            $table->string('name');        // Banner title
+            $table->string('image');       // Path to banner image
+            $table->boolean('active')->default(true);
+
+            // Optional: associates banner with a specific game
+            $table->foreignId('game_id')
+                ->nullable()
+                ->constrained('games')
+                ->nullOnDelete();
+
             $table->timestamps();
         });
+
     }
 
     /**

@@ -11,8 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transaksis', function (Blueprint $table) {
+        Schema::create('metode_pembayarans', function (Blueprint $table) {
             $table->id();
+
+            $table->string('name');               // e.g., Bank Transfer, QRIS, Dana, Ovo
+            $table->decimal('fee', 12, 2)->default(0);
+            $table->string('image')->nullable(); 
+            $table->string('logo')->nullable();  
+
             $table->timestamps();
         });
     }
@@ -22,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaksis');
+        Schema::dropIfExists('metode_pembayarans');
     }
 };

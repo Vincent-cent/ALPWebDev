@@ -1,0 +1,44 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Global Custom styles for TOSHOP */
+:root {
+    --primary-bg: #222847;
+    --active-color: #FFE292;
+    --hover-bg: rgba(255, 226, 146, 0.1);
+    --secondary-bg: #2d3348;
+}
+
+/* Ensure smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-bg);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--active-color);
+}
+
+/* Global text selection */
+::selection {
+    background-color: var(--active-color);
+    color: var(--primary-bg);
+}
+
+/* Focus outline for accessibility */
+*:focus {
+    outline: 2px solid var(--active-color);
+    outline-offset: 2px;
+}

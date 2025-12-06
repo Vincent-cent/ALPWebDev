@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('promo_notifikasis', function (Blueprint $table) {
             $table->id();
+
+            $table->string('title');        // e.g. "Limited Time Event!"
+            $table->text('description')->nullable();
+
+            // Optional — ties notification to a promo code
+            $table->foreignId('promo_code_id')
+                ->nullable()
+                ->constrained('promo_codes')
+                ->nullOnDelete();
+
+            $table->string('image')->nullable();  // Banner image
+
             $table->timestamps();
         });
     }

@@ -13,6 +13,22 @@ return new class extends Migration
     {
         Schema::create('histori_transaksis', function (Blueprint $table) {
             $table->id();
+
+            // 🔗 Reference to transaksi
+            $table->foreignId('transaksi_id')
+                ->nullable()
+                ->constrained('transaksis')
+                ->nullOnDelete();
+
+            // 🔗 The user who performed the action (admin or user)
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            // Notes such as "Payment confirmed", "Waiting for admin"
+            $table->text('note')->nullable();
+
             $table->timestamps();
         });
     }

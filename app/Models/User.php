@@ -48,4 +48,21 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function saldo()
+    {
+        return $this->belongsTo(Saldo::class);
+    }
+
+
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class);
+    }
+
+    public function userGames()
+    {
+        return $this->hasMany(UserGame::class);
+    }
+
 }

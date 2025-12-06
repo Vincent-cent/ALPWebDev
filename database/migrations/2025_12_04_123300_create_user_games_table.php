@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('user_games', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
+
+            $table->string('user_game_uid');// In-game UID
+            $table->string('server_id')->nullable();// In-game Server ID
+            $table->string('nickname')->nullable(); // Optional nickname
+
             $table->timestamps();
         });
     }

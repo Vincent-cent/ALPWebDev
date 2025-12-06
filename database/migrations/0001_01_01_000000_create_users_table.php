@@ -22,15 +22,15 @@ return new class extends Migration
 
             $table->enum('role', ['admin', 'user'])->default('user');
 
-            $table->unsignedBigInteger('saldo_id')->nullable();
+            // $table->unsignedBigInteger(column: 'saldo_id')->nullable();
 
             $table->rememberToken();
             $table->timestamps();
 
-            $table->foreign('saldo_id')
-                ->references('id')
-                ->on('saldos')
-                ->nullOnDelete();
+            // $table->foreign('saldo_id')
+            //     ->references('id')
+            //     ->on('saldos')
+            //     ->nullOnDelete();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
