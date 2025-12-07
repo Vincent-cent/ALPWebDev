@@ -1,5 +1,6 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
-
+body {
+    background: linear-gradient(to bottom, #F7FFFF 30%, #eef1f4 70%) !important;
+}
 /* Global Custom styles for TOSHOP */
 :root {
     --primary-bg: #222847;

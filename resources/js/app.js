@@ -1,7 +1,8 @@
-import './bootstrap';
+
+import '../sass/app.scss';
+import Alpine from 'alpinejs';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 

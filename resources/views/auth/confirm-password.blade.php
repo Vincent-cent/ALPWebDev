@@ -1,27 +1,47 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+    @extends('layouts.mainLayout')
+
+@section('title', 'Confirm Password - TOSHOP')
+
+@section('content')
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #2c3e50, #34495e);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg border-0" style="background-color: rgba(52, 73, 94, 0.9); border-radius: 20px;">
+                    <div class="card-body p-5">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <h2 class="text-white fw-bold mb-3">Confirm Password</h2>
+                            <p class="text-white-50 small">
+                                This is a secure area of the application. Please confirm your password before continuing.
+                            </p>
+                        </div>
+
+                        <!-- Confirm Form -->
+                        <form method="POST" action="{{ route('password.confirm') }}">
+                            @csrf
+                            
+                            <!-- Password -->
+                            <div class="mb-4">
+                                <input type="password" class="form-control rounded-pill py-3 ps-4" 
+                                       name="password" placeholder="Current Password" required autocomplete="current-password">
+                                @error('password')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn rounded-pill py-3 fw-semibold" 
+                                        style="background-color: #FFE292; color: #222847;">
+                                    Confirm
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <form method="POST" action="{{ route('password.confirm') }}">
-        @csrf
-
-        <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+</div>
+@endsection

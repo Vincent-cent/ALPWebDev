@@ -37,7 +37,7 @@
             @auth
                 <!-- Profile Icon for authenticated users -->
                 <div class="nav-icon-container position-relative">
-                    <a href="{{ route('contact') }}" class="nav-icon {{ request()->routeIs('contact') ? 'active' : '' }}">
+                    <a href="{{ route('profile.show') }}" class="nav-icon {{ request()->routeIs('profile.*') ? 'active' : '' }}">
                         <i class="fas fa-user-circle"></i>
                     </a>
                     <div class="nav-tooltip">Profile</div>
@@ -47,7 +47,7 @@
                 <a href="{{ route('login') }}" class="btn btn-outline-light rounded-pill px-4 me-2">
                     <i class="fas fa-sign-in-alt me-1"></i>Login
                 </a>
-                <a href="{{ route('register') }}" class="btn rounded-pill px-4 btn-signup-custom">
+                <a href="{{ route('register') }}" class="btn rounded-pill px-4" style="background-color: #FFE292; color: #222847; font-weight: 600; border: none;">
                     <i class="fas fa-user-plus me-1"></i>Sign up
                 </a>
             @endauth
