@@ -11,7 +11,6 @@
             padding-right: var(--bs-gutter-x, 0.75rem) !important;
         }
         
-        /* Ensure proper spacing */
         body {
             line-height: 1.5 !important;
         }
@@ -175,7 +174,6 @@
         </div>
     </section>
 
-    <!-- Recommended Items -->
     <section class="py-5 bg-light">
         <div class="container">
             <div class="row mb-4">

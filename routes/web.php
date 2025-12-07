@@ -32,6 +32,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Profile Portal Routes
+    Route::get('/profile/dashboard', function () {
+        return view('portal.user.profile.profile');
+    })->name('profile.show');
+    
+    Route::get('/profile/history', function () {
+        return view('portal.user.profile.history');
+    })->name('profile.history');
+    
+    Route::get('/profile/saldo-topup', function () {
+        return view('portal.user.profile.saldo-topup');
+    })->name('profile.saldo-topup');
 });
 
 require __DIR__.'/auth.php';

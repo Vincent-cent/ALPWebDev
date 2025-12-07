@@ -1,6 +1,13 @@
-@import "bootstrap/scss/bootstrap";
+// 1. Bootstrap required functions first
 @import "bootstrap/scss/functions";
 
+// 2. Variables override (your customization)
 $font-family-sans-serif: 'Poppins', sans-serif;
 
+// 3. Rest of Bootstrap required files
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+
+// 4. Finally import Bootstrap itself ONCE
 @import "bootstrap/scss/bootstrap";
