@@ -1,0 +1,88 @@
+/* Beranda Page Styles - Isolated to prevent conflicts */
+.beranda-page .game-card, 
+.beranda-page .voucher-card, 
+.beranda-page .recommended-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+/* Reset any unwanted inherited styles */
+.beranda-page * {
+    box-sizing: border-box;
+}
+
+.beranda-page .game-card:hover, 
+.beranda-page .voucher-card:hover, 
+.beranda-page .recommended-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.carousel-item img {
+    filter: brightness(0.7);
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.hero-section {
+    margin-top: -20px;
+}
+
+.btn-primary-custom {
+    background-color: var(--active-color);
+    color: var(--primary-bg);
+    border-color: var(--active-color);
+    font-weight: 600;
+}
+
+.btn-primary-custom:hover {
+    background-color: #e6cc83;
+    color: var(--primary-bg);
+    border-color: #e6cc83;
+}
+
+.game-icon-placeholder {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    height: 120px;
+}
+
+.voucher-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 123, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 226, 146, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .hero-section .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .carousel-item img {
+        height: 200px !important;
+    }
+    
+    .col-game-mobile {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}

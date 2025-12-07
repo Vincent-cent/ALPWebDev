@@ -1,0 +1,137 @@
+/* Navigation Bar Styles */
+.nav-icon-container {
+    position: relative;
+}
+
+.nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.nav-icon:hover {
+    background-color: rgba(255, 226, 146, 0.1);
+    color: #FFE292;
+    transform: translateY(-2px);
+}
+
+.nav-icon.active {
+    background-color: rgba(255, 226, 146, 0.2);
+    color: #FFE292;
+}
+
+.nav-tooltip {
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.nav-icon-container:hover .nav-tooltip {
+    opacity: 1;
+    visibility: visible;
+    bottom: -30px;
+}
+
+.navbar-custom {
+    background-color: #222847;
+    padding: 0.5rem 0;
+}
+
+.navbar-brand-custom {
+    color: #FFE292;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.navbar-brand-custom:hover {
+    color: #FFE292;
+}
+
+.navbar-brand-custom .logo-image {
+    transition: transform 0.3s ease;
+    filter: brightness(1);
+}
+
+.navbar-brand-custom:hover .logo-image {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+.navbar-brand-custom {
+    padding: 0.25rem 0;
+}
+
+.search-input {
+    background-color: #2d3348;
+    border: none;
+    color: white;
+    height: 45px;
+}
+
+.search-input:focus {
+    background-color: #2d3348 !important;
+    border-color: #FFE292 !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 226, 146, 0.25) !important;
+    color: white !important;
+}
+
+.search-input::placeholder {
+    color: #6c757d;
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+}
+
+.btn-signup-custom {
+    background-color: #FFE292;
+    color: #222847;
+    font-weight: 600;
+}
+
+.btn-signup-custom:hover {
+    background-color: #e6cc83;
+    color: #222847;
+}
+
+/* Add top padding to body to account for fixed navbar */
+body {
+    padding-top: 80px;
+}
+
+@media (max-width: 768px) {
+    .nav-tooltip {
+        display: none;
+    }
+    
+    .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    .mx-4 {
+        margin-left: 1rem !important;
+        margin-right: 1rem !important;
+    }
+}

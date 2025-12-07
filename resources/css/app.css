@@ -1,11 +1,44 @@
-@import 'tailwindcss';
+@import 'bootstrap/dist/css/bootstrap.min.css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* Global Custom styles for TOSHOP */
+:root {
+    --primary-bg: #222847;
+    --active-color: #FFE292;
+    --hover-bg: rgba(255, 226, 146, 0.1);
+    --secondary-bg: #2d3348;
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* Ensure smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-bg);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--active-color);
+}
+
+/* Global text selection */
+::selection {
+    background-color: var(--active-color);
+    color: var(--primary-bg);
+}
+
+/* Focus outline for accessibility */
+*:focus {
+    outline: 2px solid var(--active-color);
+    outline-offset: 2px;
 }
