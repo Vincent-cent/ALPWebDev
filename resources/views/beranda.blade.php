@@ -2,25 +2,6 @@
 
 @section('title', 'Beranda - TOSHOP')
 
-@push('styles')
-    @vite('resources/css/beranda.css')
-    <style>
-        /* Override any conflicting Livewire styles */
-        .container-fluid, .container {
-            padding-left: var(--bs-gutter-x, 0.75rem) !important;
-            padding-right: var(--bs-gutter-x, 0.75rem) !important;
-        }
-        
-        body {
-            line-height: 1.5 !important;
-        }
-    </style>
-@endpush
-
-@push('scripts')
-    @vite('resources/js/beranda.js')
-@endpush
-
 @section('content')
 <div class="container-fluid px-0 beranda-page">
     <!-- Hero Section with Banners -->
