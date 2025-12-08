@@ -20,7 +20,7 @@ Route::get('/', function () {
     return view('beranda');
 })->name('beranda');
 
-Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder']);
+Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder'] );
 
 // Route::get('/beranda', function () {
 //     return view('beranda');
