@@ -9,8 +9,13 @@ class BannerPromo extends Model
     protected $fillable = [
         'name',
         'image',
-        'active',
+        'is_active',
+        'order',
         'game_id',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function game()

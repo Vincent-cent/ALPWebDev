@@ -1,6 +1,10 @@
 <?php
 
 namespace Database\Seeders;
+use App\Models\Game;
+use App\Models\BannerPromo;
+use App\Models\Item;
+use App\Models\TipeItem;
 
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -13,11 +17,163 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
+        // User::factory(10)->create();
+        $this->call([
+            GameSeeder::class,
+            BannerPromoSeeder::class,
+            TipeItemSeeder::class,
+            ItemSeeder::class,
+        ]);
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+    }
+}
+
+class TipeItemSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $types = [
+            ['name' => 'Diamond', 'icon' => '💎'],
+            ['name' => 'Voucher', 'icon' => '🎟️'],
+            ['name' => 'BattlePass', 'icon' => '🎮'],
+            ['name' => 'Membership', 'icon' => '👑'],
+        ];
+
+        foreach ($types as $type) {
+            TipeItem::firstOrCreate($type);
+        }
+    }
+}
+
+class ItemSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $mobileLegends = Game::where('name', 'Mobile Legends')->first();
+        $freeFire = Game::where('name', 'Free Fire')->first();
+        $steam = Game::where('name', 'Steam Wallet')->first();
+
+        $diamond = TipeItem::where('name', 'Diamond')->first();
+        $voucher = TipeItem::where('name', 'Voucher')->first();
+
+        if ($mobileLegends && $diamond) {
+            $mlItems = [
+                ['nama' => '5 Diamond', 'harga' => 1500, 'harga_coret' => 2000, 'discount_percent' => 25],
+                ['nama' => '12 Diamond', 'harga' => 3500, 'harga_coret' => 4500, 'discount_percent' => 22],
+                ['nama' => '19 Diamond', 'harga' => 5500, 'harga_coret' => 7000, 'discount_percent' => 21],
+                ['nama' => '28 Diamond', 'harga' => 8000, 'harga_coret' => 10000, 'discount_percent' => 20],
+            ];
+
+            foreach ($mlItems as $item) {
+                Item::create(array_merge($item, [
+                    'game_id' => $mobileLegends->id,
+                    'tipe_item_id' => $diamond->id,
+                    'image' => 'items/placeholder.jpg',
+                ]));
+            }
+        }
+
+        if ($freeFire && $diamond) {
+            $ffItems = [
+                ['nama' => '50 Diamond', 'harga' => 7000, 'harga_coret' => 8500, 'discount_percent' => 18],
+                ['nama' => '140 Diamond', 'harga' => 19000, 'harga_coret' => 23000, 'discount_percent' => 17],
+            ];
+
+            foreach ($ffItems as $item) {
+                Item::create(array_merge($item, [
+                    'game_id' => $freeFire->id,
+                    'tipe_item_id' => $diamond->id,
+                    'image' => 'items/placeholder.jpg',
+                ]));
+            }
+        }
+
+        if ($steam && $voucher) {
+            $steamItems = [
+                ['nama' => 'Steam Wallet IDR 12.000', 'harga' => 13000, 'harga_coret' => 14000, 'discount_percent' => 7],
+                ['nama' => 'Steam Wallet IDR 60.000', 'harga' => 62000, 'harga_coret' => 66000, 'discount_percent' => 6],
+            ];
+
+            foreach ($steamItems as $item) {
+                Item::create(array_merge($item, [
+                    'game_id' => $steam->id,
+                    'tipe_item_id' => $voucher->id,
+                    'image' => 'items/placeholder.jpg',
+                ]));
+            }
+        }
+    }
+}
+
+class GameSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $games = [
+            [
+                'name' => 'Mobile Legends',
+                'description' => 'Mobile Legends: Bang Bang adalah game MOBA 5v5 terbaik di perangkat mobile. Bergabunglah dengan teman-temanmu dalam pertempuran 5v5! 10 detik matchmaking, 10 menit pertempuran. Raih kemenangan dengan strategi tim terbaikmu!',
+                'image' => 'games/mobile-legends.jpg',
+                'tipe' => 'game',
+            ],
+            [
+                'name' => 'Free Fire',
+                'description' => 'Garena Free Fire adalah game battle royale terpopuler di mobile. Setiap pertempuran 10 menit menempatkan Anda di pulau terpencil dengan 49 pemain lainnya. Pemain bebas memilih posisi awal mereka, mengambil senjata dan perlengkapan, dan bertahan hidup.',
+                'image' => 'games/free-fire.jpg',
+                'tipe' => 'game',
+            ],
+            [
+                'name' => 'Steam Wallet',
+                'description' => 'Steam Wallet Code dapat digunakan di Steam untuk pembelian Games, Software, DLC dan item komunitas Steam lainnya. Anda bisa membeli apa saja yang tersedia di Steam menggunakan Steam Wallet.',
+                'image' => 'games/steam.jpg',
+                'tipe' => 'voucher',
+            ],
+        ];
+
+        foreach ($games as $game) {
+            Game::create($game);
+        }
+    }
+}
+
+class BannerPromoSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $mlGame = Game::where('name', 'Mobile Legends')->first();
+        $ffGame = Game::where('name', 'Free Fire')->first();
+        $steamGame = Game::where('name', 'Steam Wallet')->first();
+
+        $banners = [
+            [
+                'name' => 'Mobile Legends Promo',
+                'image' => 'banners/ml-banner.jpg',
+                'is_active' => true,
+                'order' => 1,
+                'game_id' => $mlGame?->id,
+            ],
+            [
+                'name' => 'Free Fire Sale',
+                'image' => 'banners/ff-banner.jpg',
+                'is_active' => true,
+                'order' => 2,
+                'game_id' => $ffGame?->id,
+            ],
+            [
+                'name' => 'Steam Wallet Discount',
+                'image' => 'banners/steam-banner.jpg',
+                'is_active' => true,
+                'order' => 3,
+                'game_id' => $steamGame?->id,
+            ],
+        ];
+
+        foreach ($banners as $banner) {
+            BannerPromo::create($banner);
+        }
     }
 }

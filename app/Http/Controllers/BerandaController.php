@@ -2,39 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\BannerPromo;
 use App\Models\Game;
+use App\Models\BannerPromo;
 use App\Models\Item;
-use App\Models\TipeItem;
+use Illuminate\Http\Request;
 
 class BerandaController extends Controller
 {
-  public function index()
+    public function index()
     {
-        $banners = BannerPromo::where('active', true)
-            ->orderBy('id', 'desc')
+        $banners = BannerPromo::where('is_active', true)
+            ->orderBy('order', 'asc')
             ->get();
-
+        
         $popularGames = Game::with('items')
-            ->take(6)
+            ->where('tipe', 'game')
+            ->take(12)
             ->get();
-
-        $vouchers = Item::where('type', 'voucher')
-            ->with('tipeItems')
+        
+        $vouchers = Game::where('tipe', 'voucher')
+            ->with('items')
+            ->take(8)
             ->get();
-
-        $games = Game::orderBy('name')->get();
-
-        $recommended = TipeItem::orderBy('price')
-            ->take(6)
+        
+        $allGames = Game::with('items')
+            ->where('tipe', 'game')
             ->get();
-
-        return view('beranda.index', compact(
+        
+        $recommended = Item::with('game')
+            ->orderBy('harga', 'asc')
+            ->take(12)
+            ->get();
+        
+        return view('beranda', compact(
             'banners',
             'popularGames',
             'vouchers',
-            'games',
+            'allGames',
             'recommended'
         ));
     }

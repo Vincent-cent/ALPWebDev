@@ -10,6 +10,7 @@ class Game extends Model
         'name',
         'description',
         'image',
+        'tipe',
     ];
 
     public function items()

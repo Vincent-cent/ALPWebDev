@@ -6,32 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('banner_promos', function (Blueprint $table) {
             $table->id();
-
-            $table->string('name');        // Banner title
-            $table->string('image');       // Path to banner image
-            $table->boolean('active')->default(true);
-
-            // Optional: associates banner with a specific game
+            $table->string('name');
+            $table->string('image');
+            $table->boolean('is_active')->default(true);
+            $table->integer('order')->default(0);
             $table->foreignId('game_id')
                 ->nullable()
                 ->constrained('games')
                 ->nullOnDelete();
-
             $table->timestamps();
         });
-
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('banner_promos');

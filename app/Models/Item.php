@@ -8,8 +8,11 @@ class Item extends Model
 {
     protected $fillable = [
         'game_id',
-        'name',
-        'type',
+        'tipe_item_id',
+        'nama',
+        'harga',
+        'harga_coret',
+        'discount_percent',
         'image',
     ];
 
@@ -18,8 +21,8 @@ class Item extends Model
         return $this->belongsTo(Game::class);
     }
 
-    public function tipeItems()
+    public function tipeItem()
     {
-        return $this->hasMany(TipeItem::class);
+        return $this->belongsTo(TipeItem::class);
     }
 }

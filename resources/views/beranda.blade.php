@@ -3,199 +3,354 @@
 @section('title', 'Beranda - TOSHOP')
 
 @section('content')
-<div class="container-fluid px-0 beranda-page">
-    <!-- Hero Section with Banners -->
-    <section class="hero-section py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    @if(isset($banners) && $banners->count() > 0)
-                        <div id="bannerCarousel" class="carousel slide shadow rounded-3" data-bs-ride="carousel">
-                            <div class="carousel-indicators">
-                                @foreach($banners as $index => $banner)
-                                    <button type="button" data-bs-target="#bannerCarousel" 
-                                            data-bs-slide-to="{{ $index }}" 
-                                            class="{{ $index == 0 ? 'active' : '' }}" 
-                                            aria-current="{{ $index == 0 ? 'true' : 'false' }}"
-                                            aria-label="Slide {{ $index + 1 }}"></button>
-                                @endforeach
+    <div class="container-fluid px-0 beranda-page"
+        style="background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%); min-height: 100vh;">
+        <section class="hero-section py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        @if (isset($banners) && $banners->count() > 0)
+                            <div class="banner-carousel-wrapper position-relative" style="height: 400px; overflow: hidden;">
+                                <div class="d-flex align-items-center justify-content-center position-relative h-100">
+                                    @foreach ($banners as $index => $banner)
+                                        @php
+                                            $bannerImage = $banner->image && file_exists(storage_path('app/public/' . $banner->image))
+                                                ? asset('storage/' . $banner->image)
+                                                : asset('/placeholder.jpg');
+                                        @endphp
+                                        <div class="banner-slide position-absolute {{ $index == 0 ? 'active center' : ($index == 1 ? 'right' : 'hidden') }}" 
+                                             data-index="{{ $index }}"
+                                             style="transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);">
+                                            <img src="{{ $bannerImage }}" class="d-block w-100 rounded-4 shadow-lg"
+                                                alt="{{ $banner->name }}" style="object-fit: cover;">
+                                        </div>
+                                    @endforeach
+                                </div>
+                                
+                                <!-- Custom Navigation Buttons -->
+                                <button class="carousel-control-prev position-absolute start-0 top-50 translate-middle-y" 
+                                        type="button" onclick="previousSlide()"
+                                        style="width: auto; opacity: 1; z-index: 10; background: none; border: none;">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true" 
+                                          style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 50%; backdrop-filter: blur(10px);"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next position-absolute end-0 top-50 translate-middle-y" 
+                                        type="button" onclick="nextSlide()"
+                                        style="width: auto; opacity: 1; z-index: 10; background: none; border: none;">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"
+                                          style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 50%; backdrop-filter: blur(10px);"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                                
+                                <!-- Indicators at Bottom -->
+                                <div class="carousel-indicators position-absolute bottom-0 start-50 translate-middle-x mb-3" style="z-index: 10;">
+                                    @foreach ($banners as $index => $banner)
+                                        <button type="button" class="indicator-dot {{ $index == 0 ? 'active' : '' }}" 
+                                                data-slide="{{ $index }}"
+                                                onclick="goToSlide({{ $index }})"
+                                                style="width: 10px; height: 10px; border-radius: 50%; margin: 0 5px; border: none; padding: 0;"></button>
+                                    @endforeach
+                                </div>
                             </div>
-                            <div class="carousel-inner rounded-3">
-                                @foreach($banners as $index => $banner)
-                                    <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                        <img src="{{ $banner->image_url }}" class="d-block w-100 object-fit-cover" 
-                                             alt="{{ $banner->title }}" height="300">
-                                        <div class="carousel-caption d-none d-md-block">
-                                            <h5 class="fw-bold">{{ $banner->title }}</h5>
-                                            <p class="mb-0">{{ $banner->description }}</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-4">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px; font-size: 1.2rem;">Popular
+                        Choice</h2>
+                </div>
+                <div class="row g-3">
+                    @if (isset($popularGames) && $popularGames->count() > 0)
+                        @foreach ($popularGames->take(10) as $game)
+                            <div class="col-lg-2 col-md-3 col-4">
+                                <a href="{{ route('game.detail', $game->id) }}" class="text-decoration-none">
+                                    <div class="card game-card h-100 border-0 shadow-sm"
+                                        style="background: #2a3150; border-radius: 15px; transition: transform 0.3s;">
+                                        <div class="card-body p-3 text-center">
+                                            <div class="position-relative mb-2">
+                                                @php
+                                                    $imagePath = $game->image && file_exists(storage_path('app/public/' . $game->image))
+                                                        ? asset('storage/' . $game->image)
+                                                        : asset('/placeholder.jpg');
+                                                @endphp
+                                                <img src="{{ $imagePath }}" alt="{{ $game->name }}"
+                                                    class="img-fluid rounded-3"
+                                                    style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+                                                @if ($game->items->where('discount_percent', '>', 0)->count() > 0)
+                                                    <span
+                                                        class="position-absolute top-0 end-0 badge bg-warning text-dark m-1"
+                                                        style="font-size: 0.7rem;">
+                                                        <i class="fas fa-bolt"></i>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <h6 class="card-title text-white fw-bold mb-0" style="font-size: 0.85rem;">
+                                                {{ $game->name }}</h6>
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
-                            <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
-                    @else
-                        <!-- Default hero content if no banners -->
-                        <div class="bg-primary bg-gradient text-center py-5 rounded-3 text-white shadow">
-                            <div class="container">
-                                <h1 class="display-4 fw-bold mb-3">Selamat Datang di TOSHOP</h1>
-                                <p class="lead fs-5 mb-4 text-white-50">Platform terpercaya untuk top up game dan produk digital</p>
-                                <a href="#games-section" class="btn btn-primary-custom btn-lg px-5 btn-cta-games">
-                                    <i class="fas fa-gamepad me-2"></i>Mulai Top Up
                                 </a>
                             </div>
-                        </div>
+                        @endforeach
                     @endif
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Popular Games Section -->
-    <section id="games-section" class="py-5 bg-light">
-        <div class="container">
-            <div class="row mb-4">
-                <div class="col-12 text-center text-md-start">
-                    <h2 class="display-6 fw-bold mb-3">
-                        <i class="fas fa-fire text-warning me-2"></i>Game Populer
+        <section class="py-4">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px; font-size: 1.2rem;">Voucher
                     </h2>
-                    <p class="lead text-muted mb-0">Top up game favorit kamu dengan mudah dan cepat</p>
                 </div>
-            </div>
-            <div class="row g-4">
-                @if(isset($popularGames) && $popularGames->count() > 0)
-                    @foreach($popularGames as $game)
-                        <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 col-6">
-                            <div class="card game-card h-100 border-0 shadow-sm">
-                                <div class="card-img-top d-flex align-items-center justify-content-center game-icon-placeholder">
-                                    @if($game->icon)
-                                        <img src="{{ $game->icon }}" alt="{{ $game->name }}" 
-                                             class="img-fluid" style="max-height: 80px; max-width: 80px; object-fit: contain;">
-                                    @else
-                                        <i class="fas fa-gamepad fa-3x text-muted"></i>
-                                    @endif
-                                </div>
-                                <div class="card-body text-center p-3">
-                                    <h6 class="card-title fw-bold mb-2 text-truncate" title="{{ $game->name }}">{{ $game->name }}</h6>
-                                    <small class="text-muted">
-                                        <i class="fas fa-cube me-1"></i>{{ $game->items->count() ?? 0 }} item
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="col-12">
-                        <div class="text-center py-5">
-                            <i class="fas fa-gamepad fa-4x text-muted mb-3"></i>
-                            <h5 class="text-muted mb-2">Belum ada game tersedia</h5>
-                            <p class="text-muted small">Game akan segera ditambahkan</p>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </section>
-
-    <!-- Voucher Section -->
-    <section class="py-5">
-        <div class="container">
-            <div class="row mb-4">
-                <div class="col-12 text-center text-md-start">
-                    <h2 class="display-6 fw-bold mb-3">
-                        <i class="fas fa-ticket-alt text-primary me-2"></i>Voucher Digital
-                    </h2>
-                    <p class="lead text-muted mb-0">Berbagai voucher digital untuk kebutuhan sehari-hari</p>
-                </div>
-            </div>
-            <div class="row g-4">
-                @if(isset($vouchers) && $vouchers->count() > 0)
-                    @foreach($vouchers->take(8) as $voucher)
-                        <div class="col-xl-3 col-lg-4 col-md-6">
-                            <div class="card voucher-card h-100 border-0 shadow-sm">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="voucher-icon me-3 flex-shrink-0">
-                                            <i class="fas fa-gift fa-lg text-primary"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="card-title mb-1 fw-bold text-truncate" title="{{ $voucher->name }}">{{ $voucher->name }}</h6>
-                                            <small class="text-muted">{{ $voucher->description ?? 'Voucher Digital' }}</small>
+                <div class="row g-3">
+                    @if (isset($vouchers) && $vouchers->count() > 0)
+                        @foreach ($vouchers->take(4) as $voucher)
+                            <div class="col-lg-3 col-md-4 col-6">
+                                <a href="{{ route('game.detail', $voucher->id) }}" class="text-decoration-none">
+                                    <div class="card voucher-card h-100 border-0 shadow-sm"
+                                        style="background: #2a3150; border-radius: 15px;">
+                                        <div class="card-body p-3 text-center">
+                                            @php
+                                                $voucherImage = $voucher->image && file_exists(storage_path('app/public/' . $voucher->image))
+                                                    ? asset('storage/' . $voucher->image)
+                                                    : asset('/placeholder.jpg');
+                                            @endphp
+                                            <img src="{{ $voucherImage }}"
+                                                alt="{{ $voucher->name }}" class="img-fluid rounded-3 mb-2"
+                                                style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+                                            <h6 class="card-title text-white fw-bold mb-0" style="font-size: 0.85rem;">
+                                                {{ $voucher->name }}</h6>
                                         </div>
                                     </div>
-                                    @if(isset($voucher->tipeItems) && $voucher->tipeItems->count() > 0)
-                                        <div class="mt-auto">
-                                            <small class="text-muted d-block">Mulai dari</small>
-                                            <div class="h6 fw-bold text-success mb-0">
-                                                <i class="fas fa-tag me-1"></i>Rp {{ number_format($voucher->tipeItems->min('price'), 0, ',', '.') }}
+                                </a>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+        </section>
+
+        <section class="py-4">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px; font-size: 1.2rem;">Games</h2>
+                </div>
+                <div class="row g-3">
+                    @if (isset($allGames) && $allGames->count() > 0)
+                        @foreach ($allGames as $game)
+                            <div class="col-lg-2 col-md-3 col-4">
+                                <a href="{{ route('game.detail', $game->id) }}" class="text-decoration-none">
+                                    <div class="card game-card h-100 border-0 shadow-sm"
+                                        style="background: #2a3150; border-radius: 15px;">
+                                        <div class="card-body p-3 text-center">
+                                            <div class="position-relative mb-2">
+                                                @php
+                                                    $gameImage = $game->image && file_exists(storage_path('app/public/' . $game->image))
+                                                        ? asset('storage/' . $game->image)
+                                                        : asset('/placeholder.jpg');
+                                                @endphp
+                                                <img src="{{ $gameImage }}"
+                                                    alt="{{ $game->name }}" class="img-fluid rounded-3"
+                                                    style="width: 100%; aspect-ratio: 1; object-fit: cover;">
                                             </div>
+                                            <h6 class="card-title text-white fw-bold mb-0" style="font-size: 0.85rem;">
+                                                {{ $game->name }}</h6>
                                         </div>
-                                    @endif
-                                </div>
+                                    </div>
+                                </a>
                             </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="col-12">
-                        <div class="text-center py-5">
-                            <i class="fas fa-ticket-alt fa-4x text-muted mb-3"></i>
-                            <h5 class="text-muted mb-2">Belum ada voucher tersedia</h5>
-                            <p class="text-muted small">Voucher akan segera ditambahkan</p>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </section>
-
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="row mb-4">
-                <div class="col-12 text-center text-md-start">
-                    <h2 class="display-6 fw-bold mb-3">
-                        <i class="fas fa-star text-warning me-2"></i>Rekomendasi
-                    </h2>
-                    <p class="lead text-muted mb-0">Item dengan harga terbaik untuk kamu</p>
+                        @endforeach
+                    @endif
+                </div>
+                <div class="text-center mt-4">
+                    <button class="btn btn-warning text-dark fw-bold px-5 py-2"
+                        style="border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                        Tampilkan Semua
+                    </button>
                 </div>
             </div>
-            <div class="row g-4">
-                @if(isset($recommended) && $recommended->count() > 0)
-                    @foreach($recommended as $item)
-                        <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6">
-                            <div class="card recommended-card h-100 border-0 shadow-sm">
-                                <div class="card-body text-center p-3 d-flex flex-column">
-                                    <div class="item-icon mb-3">
-                                        <i class="fas fa-coins fa-2x"></i>
-                                    </div>
-                                    <h6 class="card-title fw-bold mb-2 text-truncate" title="{{ $item->name }}">{{ $item->name }}</h6>
-                                    <div class="price h6 fw-bold text-success mb-3">
-                                        <i class="fas fa-rupiah-sign me-1"></i>Rp {{ number_format($item->price, 0, ',', '.') }}
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary mt-auto w-100 btn-buy-item">
-                                        <i class="fas fa-shopping-cart me-1"></i>Beli Sekarang
-                                    </button>
+        </section>
+
+        <section class="py-4 mb-5">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px; font-size: 1.2rem;">News and
+                        Update</h2>
+                </div>
+                <div class="row g-3">
+                    @if (isset($banners) && $banners->count() > 0)
+                        @foreach ($banners->take(2) as $banner)
+                            <div class="col-lg-6 col-md-6">
+                                <div class="card border-0 shadow-sm"
+                                    style="background: #2a3150; border-radius: 15px; overflow: hidden;">
+                                    @php
+                                        $newsImage = $banner->image && file_exists(storage_path('app/public/' . $banner->image))
+                                            ? asset('storage/' . $banner->image)
+                                            : asset('/placeholder.jpg');
+                                    @endphp
+                                    <img src="{{ $newsImage }}" class="card-img-top"
+                                        alt="{{ $banner->name }}" style="height: 200px; object-fit: cover;">
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="col-12">
-                        <div class="text-center py-5">
-                            <i class="fas fa-star fa-4x text-muted mb-3"></i>
-                            <h5 class="text-muted mb-2">Belum ada rekomendasi tersedia</h5>
-                            <p class="text-muted small">Rekomendasi akan segera ditambahkan</p>
-                        </div>
-                    </div>
-                @endif
+                        @endforeach
+                    @endif
+                </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
+
+    <style>
+        .game-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .banner-slide {
+            width: 700px;
+            height: 350px;
+            transform-origin: center;
+        }
+
+        .banner-slide.center {
+            transform: translateX(0) scale(1);
+            opacity: 1;
+            z-index: 3;
+            left: 50%;
+            margin-left: -350px;
+        }
+
+        .banner-slide.left {
+            transform: translateX(-450px) scale(0.7);
+            opacity: 0.5;
+            z-index: 1;
+            left: 50%;
+            margin-left: -350px;
+        }
+
+        .banner-slide.right {
+            transform: translateX(450px) scale(0.7);
+            opacity: 0.5;
+            z-index: 1;
+            left: 50%;
+            margin-left: -350px;
+        }
+
+        .banner-slide.hidden {
+            transform: translateX(0) scale(0.7);
+            opacity: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .banner-slide img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .indicator-dot {
+            background-color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background-color: white;
+            transform: scale(1.3);
+        }
+
+        @media (max-width: 768px) {
+            .banner-slide {
+                width: 90%;
+                max-width: 400px;
+            }
+            
+            .banner-slide.center {
+                margin-left: -45%;
+            }
+            
+            .banner-slide.left,
+            .banner-slide.right {
+                display: none;
+            }
+        }
+    </style>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = {{ $banners->count() }};
+        let isTransitioning = false;
+
+        function updateSlidePositions() {
+            const slides = document.querySelectorAll('.banner-slide');
+            const indicators = document.querySelectorAll('.indicator-dot');
+            
+            slides.forEach((slide, index) => {
+                slide.classList.remove('center', 'left', 'right', 'hidden', 'active');
+                indicators[index].classList.remove('active');
+                
+                if (index === currentSlide) {
+                    slide.classList.add('center', 'active');
+                    indicators[index].classList.add('active');
+                } else if (index === (currentSlide - 1 + totalSlides) % totalSlides) {
+                    slide.classList.add('left');
+                } else if (index === (currentSlide + 1) % totalSlides) {
+                    slide.classList.add('right');
+                } else {
+                    slide.classList.add('hidden');
+                }
+            });
+        }
+
+        function nextSlide() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlidePositions();
+            
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 600);
+        }
+
+        function previousSlide() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlidePositions();
+            
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 600);
+        }
+
+        function goToSlide(index) {
+            if (isTransitioning || index === currentSlide) return;
+            isTransitioning = true;
+            
+            currentSlide = index;
+            updateSlidePositions();
+            
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 600);
+        }
+
+        let autoplayInterval = setInterval(nextSlide, 5000);
+
+        document.querySelector('.banner-carousel-wrapper')?.addEventListener('mouseenter', () => {
+            clearInterval(autoplayInterval);
+        });
+
+        document.querySelector('.banner-carousel-wrapper')?.addEventListener('mouseleave', () => {
+            autoplayInterval = setInterval(nextSlide, 5000);
+        });
+
+        updateSlidePositions();
+    </script>
 @endsection

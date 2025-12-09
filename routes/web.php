@@ -2,6 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GameDetailController;
+use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\BerandaController;
+
+Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
 
 Route::get('/topup', function () {
@@ -16,16 +21,20 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
-Route::get('/', function () {
-    return view('beranda');
-})->name('beranda');
-
 Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder'] );
 
 // Route::get('/beranda', function () {
 //     return view('beranda');
 // })->middleware(['auth', 'verified'])->name('beranda');
 
+Route::get('/game/{id}', [GameDetailController::class, 'show'])->name('game.detail');
+Route::post('/promo/verify', [GameDetailController::class, 'verifyPromo'])->name('promo.verify');
+
+// Transaction Routes
+Route::middleware('auth')->group(function () {
+    Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
+    Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
+});
 
 
 Route::middleware('auth')->group(function () {
