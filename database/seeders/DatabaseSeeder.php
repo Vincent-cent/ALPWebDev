@@ -37,10 +37,10 @@ class TipeItemSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            ['name' => 'Diamond', 'icon' => '💎'],
-            ['name' => 'Voucher', 'icon' => '🎟️'],
-            ['name' => 'BattlePass', 'icon' => '🎮'],
-            ['name' => 'Membership', 'icon' => '👑'],
+            ['name' => 'Diamond',],
+            ['name' => 'Voucher'],
+            ['name' => 'BattlePass'],
+            ['name' => 'Membership'],
         ];
 
         foreach ($types as $type) {

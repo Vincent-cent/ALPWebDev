@@ -7,22 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class TipeItem extends Model
 {
     protected $fillable = [
-        'item_id',
         'name',
-        'price',
-        'stock',
-        'discount',
-        'image',
     ];
 
-    public function item()
+    public function items()
     {
-        return $this->belongsTo(Item::class);
-    }
-
-    public function transaksiItems()
-    {
-        return $this->hasMany(TransaksiItem::class);
+        return $this->hasMany(Item::class);
     }
 
     public function promoCodes()

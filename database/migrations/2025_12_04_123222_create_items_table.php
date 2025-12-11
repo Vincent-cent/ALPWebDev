@@ -13,23 +13,17 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-
-            // 🔗 FK to game
-            $table->foreignId('game_id')
-                  ->constrained('games')
-                  ->cascadeOnDelete();
-
-            $table->string('name');                 // e.g., Diamonds, Subscription, Skin
-            $table->string('type')->nullable();     // optional type classification
-            $table->string('image')->nullable();    // card thumbnail
-
+            $table->foreignId('game_id')->constrained('games')->cascadeOnDelete();
+            $table->foreignId('tipe_item_id')->constrained('tipe_items')->cascadeOnDelete();
+            $table->string('nama');
+            $table->decimal('harga', 12, 2);
+            $table->decimal('harga_coret', 12, 2)->nullable();
+            $table->integer('discount_percent')->default(0);
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('items');
