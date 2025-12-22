@@ -16,7 +16,9 @@
                 <!-- Main Content -->
                 <div class="row g-4">
                     <div class="col-lg-8">
-                        <div class="card border-0 shadow-lg" style="background: rgba(52, 73, 94, 0.9); border-radius: 20px;">
+                        <form method="POST" action="{{ route('saldo.topup') }}">
+                            @csrf
+                            <div class="card border-0 shadow-lg" style="background: rgba(52, 73, 94, 0.9); border-radius: 20px;">
                             <div class="card-body p-4">
                                 <!-- Nominal Input Section -->
                                 <div class="mb-5">
@@ -24,10 +26,10 @@
                                     <div class="input-group">
                                         <span class="input-group-text bg-transparent border-0 text-white fw-semibold" 
                                               style="background-color: rgba(44, 62, 80, 0.8) !important;">Rp.</span>
-                                        <input type="number" class="form-control border-0 py-3" 
-                                               placeholder="Nominal" 
+                                        <input type="number" name="amount" class="form-control border-0 py-3" 
+                                               placeholder="Nominal" value="{{ old('amount') }}" min="100000" required
                                                style="background-color: rgba(44, 62, 80, 0.8); color: white; border-radius: 0 10px 10px 0 !important;">
-                                        <button class="btn text-white" style="background-color: rgba(44, 62, 80, 0.8);">
+                                        <button class="btn text-white" style="background-color: rgba(44, 62, 80, 0.8);" type="button">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </div>
@@ -203,15 +205,25 @@
                                     </div>
                                 </div>
 
+                                <!-- Phone Number Section -->
+                                <div class="mb-4">
+                                    <h4 class="text-white fw-bold mb-3">
+                                        <i class="fas fa-phone me-2"></i>PHONE NUMBER
+                                    </h4>
+                                    <input type="tel" name="phone" class="form-control py-3" 
+                                           placeholder="Enter your phone number" value="{{ old('phone') }}" required
+                                           style="background-color: rgba(44, 62, 80, 0.8); color: white; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;">
+                                </div>
+
                                 <!-- Top Up Button -->
                                 <div class="text-center">
-                                    <button class="btn btn-lg rounded-pill px-5 py-3 fw-bold" 
+                                    <button type="submit" class="btn btn-lg rounded-pill px-5 py-3 fw-bold" 
                                             style="background-color: #3498db; color: white; border: none;">
                                         <i class="fas fa-arrow-up me-2"></i>Top Up Sekarang
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -247,7 +259,6 @@
 </style>
 
 <script>
-// Payment method selection
 document.addEventListener('DOMContentLoaded', function() {
     const paymentMethods = document.querySelectorAll('.payment-method');
     

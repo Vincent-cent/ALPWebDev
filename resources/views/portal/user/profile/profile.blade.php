@@ -83,7 +83,7 @@
                                                 <i class="fas fa-wallet fa-2x me-3" style="color: #FFE292;"></i>
                                                 <div>
                                                     <p class="text-white-50 small mb-1">Sisa Saldo</p>
-                                                    <h4 class="text-white fw-bold mb-0">Rp. {{ number_format(auth()->user()->balance ?? 87060, 0, ',', '.') }}</h4>
+                                                    <h4 class="text-white fw-bold mb-0">Rp. {{ number_format(auth()->user()->getSaldoAmount(), 0, ',', '.') }}</h4>
                                                 </div>
                                             </div>
                                             <a href="{{ route('profile.saldo-topup') }}" 

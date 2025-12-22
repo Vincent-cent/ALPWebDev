@@ -6,6 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Saldo;
+use App\Models\Transaksi;
+use App\Models\UserGame;
 
 class User extends Authenticatable
 {
@@ -52,6 +55,21 @@ class User extends Authenticatable
     public function saldo()
     {
         return $this->belongsTo(Saldo::class);
+    }
+
+    public function getSaldoAmount()
+    {
+        return $this->saldo ? $this->saldo->amount : 0;
+    }
+
+    public function getOrCreateSaldo()
+    {
+        if (!$this->saldo) {
+            $saldo = Saldo::create(['amount' => 0]);
+            $this->update(['saldo_id' => $saldo->id]);
+            return $saldo;
+        }
+        return $this->saldo;
     }
 
 

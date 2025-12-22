@@ -30,11 +30,22 @@ Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder
 Route::get('/game/{id}', [GameDetailController::class, 'show'])->name('game.detail');
 Route::post('/promo/verify', [GameDetailController::class, 'verifyPromo'])->name('promo.verify');
 
-// Transaction Routes
+// Transaction Routes (accessible by both authenticated users and guests)
+Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
+Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
+Route::get('/transaksi/{id}/success', [TransaksiController::class, 'success'])->name('transaksi.success');
+Route::get('/transaksi/{id}/debug', [TransaksiController::class, 'debug'])->name('transaksi.debug');
+
+// Saldo Routes
 Route::middleware('auth')->group(function () {
-    Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
-    Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
+    Route::post('/saldo/topup', [App\Http\Controllers\SaldoController::class, 'topup'])->name('saldo.topup');
+    Route::get('/saldo/payment/{id}', [App\Http\Controllers\SaldoController::class, 'payment'])->name('saldo.payment');
+    Route::get('/saldo/success/{id}', [App\Http\Controllers\SaldoController::class, 'success'])->name('saldo.success');
 });
+
+// Callback Routes
+Route::post('/callback/saldo', [App\Http\Controllers\SaldoController::class, 'callback'])->name('saldo.callback');
+Route::post('/callback/transaksi', [App\Http\Controllers\TransaksiController::class, 'callback'])->name('transaksi.callback');
 
 
 Route::middleware('auth')->group(function () {

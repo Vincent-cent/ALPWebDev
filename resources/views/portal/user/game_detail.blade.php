@@ -1,5 +1,15 @@
 @extends('layouts.mainLayout')
 
+@section('head')
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Authentication Status -->
+    <script>
+        window.isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+    </script>
+@endsection
+
 @section('content')
 <div class="container-fluid bg-dark text-white min-vh-100 py-4">
     <div class="container mb-3">
@@ -7,6 +17,41 @@
             <i class="fas fa-arrow-left me-2"></i> Kembali ke Beranda
         </a>
     </div>
+    
+    <!-- Display Success/Error Messages -->
+    @if(session('success'))
+        <div class="container mb-3">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    @endif
+    
+    @if(session('error'))
+        <div class="container mb-3">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    @endif
+    
+    @if($errors->any())
+        <div class="container mb-3">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Terjadi kesalahan:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    @endif
+    
     <div class="row">
         <div class="col-lg-3 col-md-4 mb-4">
             <div class="card bg-transparent border-0">
@@ -173,9 +218,31 @@
                 <!-- Submit Button -->
                 <div class="card bg-light">
                     <div class="card-body text-center">
-                        <button type="submit" class="btn btn-light btn-lg px-5" style="border-radius: 10px;">
+                        @guest
+                            <p class="text-muted mb-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <small>Anda berbelanja sebagai Guest. Transaksi tidak akan tersimpan dalam riwayat akun.</small>
+                            </p>
+                        @else
+                            <p class="text-success mb-3">
+                                <i class="fas fa-user-check me-2"></i>
+                                <small>Logged in as {{ auth()->user()->name }}. Transaksi akan tersimpan dalam riwayat akun Anda.</small>
+                            </p>
+                        @endguest
+                        
+                        <button type="submit" class="btn btn-primary btn-lg px-5" style="border-radius: 10px;">
                             🛒 <strong>Beli Sekarang</strong>
                         </button>
+                        
+                        @guest
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    Ingin menyimpan riwayat pembelian? 
+                                    <a href="{{ route('login') }}" class="text-decoration-none">Login</a> atau 
+                                    <a href="{{ route('register') }}" class="text-decoration-none">Daftar</a>
+                                </small>
+                            </div>
+                        @endguest
                     </div>
                 </div>
             </form>
@@ -206,55 +273,9 @@
     }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    function calculateTotal() {
-        const itemRadio = document.querySelector('input[name="item_id"]:checked');
-        const paymentRadio = document.querySelector('input[name="metode_pembayaran_id"]:checked');
-        
-        if (itemRadio && paymentRadio) {
-            const itemPrice = parseFloat(itemRadio.dataset.price);
-            const paymentFee = parseFloat(paymentRadio.dataset.fee);
-            const total = itemPrice + paymentFee;
-            
-            document.querySelectorAll('.total-price').forEach(el => {
-                el.textContent = 'Rp. ' + total.toLocaleString('id-ID');
-            });
-        }
-    }
-    
-    document.querySelectorAll('input[name="item_id"], input[name="metode_pembayaran_id"]').forEach(radio => {
-        radio.addEventListener('change', calculateTotal);
-    });
-    
-    // Check promo code
-    document.getElementById('checkPromoBtn').addEventListener('click', function() {
-        const promoCode = document.getElementById('promoCodeInput').value;
-        const messageDiv = document.getElementById('promoMessage');
-        
-        if (!promoCode) {
-            messageDiv.innerHTML = '<small class="text-danger">Masukkan kode promo terlebih dahulu</small>';
-            return;
-        }
-        
-        // AJAX call to verify promo code
-        fetch('{{ route("promo.verify") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ code: promoCode })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.valid) {
-                messageDiv.innerHTML = `<small class="text-success">Kode Promo Valid! Selamat anda mendapatkan potongan sebesar ${data.discount}% (Maksimal Rp.${data.max_discount.toLocaleString('id-ID')}) dalam pembelian ini!</small>`;
-            } else {
-                messageDiv.innerHTML = '<small class="text-danger">Kode promo tidak valid atau sudah kadaluarsa</small>';
-            }
-        });
-    });
-});
-</script>
+@endsection
+
+@section('scripts')
+    <!-- Game Detail JavaScript -->
+    <script src="{{ asset('js/game-detail.js') }}"></script>
 @endsection

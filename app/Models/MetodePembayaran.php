@@ -9,8 +9,9 @@ class MetodePembayaran extends Model
     protected $fillable = [
         'name',
         'fee',
-        'image',
+        'type',
         'logo',
+        'is_active',
     ];
 
     public function transaksis()

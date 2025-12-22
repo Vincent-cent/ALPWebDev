@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('promo_codes', function (Blueprint $table) {
             $table->id();
 
-            $table->string('code')->unique();  // Example: MLBB10OFF
-            $table->integer('kuota')->default(0); // How many times code can be used
+            $table->string('code')->unique();  
+            $table->integer('kuota')->default(0); 
 
             $table->dateTime('start_at')->nullable();
             $table->dateTime('end_at')->nullable();
 
-            // Optional: promo code may target a specific tipe_item
+            
             $table->foreignId('tipe_item_id')
                 ->nullable()
                 ->constrained('tipe_items')
