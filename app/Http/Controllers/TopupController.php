@@ -40,15 +40,30 @@ class TopupController extends Controller
             'status'       => 'pending'
         ]);
 
-        $response = Http::post('https://v1.apigames.id/v2/transaksi', [
-            'ref_id'      => $orderId,
-            'merchant_id' => $this->apiId,
-            'produk'      => $validated['diamond'],
-            'tujuan'      => $req->userid,
-            'server_id'   => $req->serverid ?? '',
-            'signature'   => md5($this->apiId . ':' . $this->apiKey . ':' . $orderId),
-        ]);
+$response = Http::asJson()->post(
+    'https://v1.apigames.id/transaksi',
+    [
+        'ref_id'      => $orderId,
+        'merchant_id' => $this->apiId,
+        'produk'      => $validated['diamond'],
+        'tujuan'      => $validated['userid'].'|'.$validated['serverid'],
+        'signature'   => md5($this->apiId.$this->apiKey.$orderId),
+    ]
+);
 
+dd([
+    'request_payload' => [
+        'ref_id'      => $orderId,
+        'merchant_id' => $this->apiId,
+        'produk'      => $validated['diamond'],
+        'tujuan'      => $validated['userid'].'|'.$validated['serverid'],
+        'signature'   => md5($this->apiId.$this->apiKey.$orderId),
+    ],
+    'status'  => $response->status(),
+    'body'    => $response->body(),
+        $response->status(),
+    $response->json()
+]);
 
         return view('order-result', [
             'order_id'   => $orderId,
@@ -58,8 +73,17 @@ class TopupController extends Controller
 
     public function resellerCallback(Request $req)
     {
-        $order = Order::where('order_id', $req->reference_id)->first();
+        $expectedSignature = md5(
+            $this->apiId .
+                $this->apiKey .
+                $req->ref_id
+        );
 
+        if ($req->signature !== $expectedSignature) {
+            return response('Invalid Signature', 403);
+        }
+
+        $order = Order::where('order_id', $req->ref_id)->first();
         if (!$order) return response('Order Not Found', 404);
 
         $order->status = $req->status;

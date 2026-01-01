@@ -27,7 +27,6 @@
                                     @endforeach
                                 </div>
                                 
-                                <!-- Custom Navigation Buttons -->
                                 <button class="carousel-control-prev position-absolute start-0 top-50 translate-middle-y" 
                                         type="button" onclick="previousSlide()"
                                         style="width: auto; opacity: 1; z-index: 10; background: none; border: none;">
@@ -43,7 +42,6 @@
                                     <span class="visually-hidden">Next</span>
                                 </button>
                                 
-                                <!-- Indicators at Bottom -->
                                 <div class="carousel-indicators position-absolute bottom-0 start-50 translate-middle-x mb-3" style="z-index: 10;">
                                     @foreach ($banners as $index => $banner)
                                         <button type="button" class="indicator-dot {{ $index == 0 ? 'active' : '' }}" 
@@ -62,8 +60,13 @@
         <section class="py-4">
             <div class="container">
                 <div class="text-center mb-4">
-                    <h2 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px; font-size: 1.2rem;">Popular
-                        Choice</h2>
+                    <div class="d-inline-block px-5 py-3 rounded-pill" 
+                         style="background: linear-gradient(90deg, #2C3356 0%, #424A70 100%); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); width: 100%; margin: 0 auto;">
+                        <h2 class="fw-bold text-white text-uppercase mb-0" 
+                            style="letter-spacing: 2px; font-size: 1.2rem;">
+                            Popular Choice
+                        </h2>
+                    </div>
                 </div>
                 <div class="row g-3">
                     @if (isset($popularGames) && $popularGames->count() > 0)
@@ -103,10 +106,15 @@
         </section>
 
         <section class="py-4">
-            <div class="container">
+           <div class="container">
                 <div class="text-center mb-4">
-                    <h2 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px; font-size: 1.2rem;">Voucher
-                    </h2>
+                    <div class="d-inline-block px-5 py-3 rounded-pill" 
+                         style="background: linear-gradient(90deg, #2C3356 0%, #424A70 100%); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); width: 100%; margin: 0 auto;">
+                        <h2 class="fw-bold text-white text-uppercase mb-0" 
+                            style="letter-spacing: 2px; font-size: 1.2rem;">
+                            Voucher
+                        </h2>
+                    </div>
                 </div>
                 <div class="row g-3">
                     @if (isset($vouchers) && $vouchers->count() > 0)
@@ -117,8 +125,8 @@
                                         style="background: #2a3150; border-radius: 15px;">
                                         <div class="card-body p-3 text-center">
                                             @php
-                                                $voucherImage = $voucher->image && file_exists(storage_path('app/public/' . $voucher->image))
-                                                    ? asset('storage/' . $voucher->image)
+                                                $voucherImage = $voucher->image && file_exists(storage_path("app/public/{$voucher->image}"))
+                                                    ? asset("storage/{$voucher->image}")
                                                     : asset('/placeholder.jpg');
                                             @endphp
                                             <img src="{{ $voucherImage }}"
@@ -131,6 +139,15 @@
                                 </a>
                             </div>
                         @endforeach
+                        @for ($i = $vouchers->count(); $i < 4; $i++)
+                            <div class="col-lg-3 col-md-4 col-6">
+                                <div style="visibility: hidden;">
+                                    <div class="card h-100 border-0" style="background: transparent;">
+                                        <div class="card-body p-3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endfor
                     @endif
                 </div>
             </div>
@@ -138,8 +155,15 @@
 
         <section class="py-4">
             <div class="container">
+                <div class="container">
                 <div class="text-center mb-4">
-                    <h2 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px; font-size: 1.2rem;">Games</h2>
+                    <div class="d-inline-block px-5 py-3 rounded-pill" 
+                         style="background: linear-gradient(90deg, #2C3356 0%, #424A70 100%); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); width: 100%; margin: 0 auto;">
+                        <h2 class="fw-bold text-white text-uppercase mb-0" 
+                            style="letter-spacing: 2px; font-size: 1.2rem;">
+                            Games
+                        </h2>
+                    </div>
                 </div>
                 <div class="row g-3">
                     @if (isset($allGames) && $allGames->count() > 0)
@@ -180,8 +204,13 @@
         <section class="py-4 mb-5">
             <div class="container">
                 <div class="text-center mb-4">
-                    <h2 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px; font-size: 1.2rem;">News and
-                        Update</h2>
+                    <div class="d-inline-block px-5 py-3 rounded-pill" 
+                         style="background: linear-gradient(90deg, #2C3356 0%, #424A70 100%); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); width: 100%; margin: 0 auto;">
+                        <h2 class="fw-bold text-white text-uppercase mb-0" 
+                            style="letter-spacing: 2px; font-size: 1.2rem;">
+                            News And Update
+                        </h2>
+                    </div>
                 </div>
                 <div class="row g-3">
                     @if (isset($banners) && $banners->count() > 0)

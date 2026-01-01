@@ -10,6 +10,7 @@ class Item extends Model
         'game_id',
         'tipe_item_id',
         'nama',
+        'item_id',
         'harga',
         'harga_coret',
         'discount_percent',
