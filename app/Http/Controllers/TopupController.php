@@ -22,7 +22,7 @@ class TopupController extends Controller
     }
 
 
-    public function createOrder(Request $req)
+    public function order(Request $req)
     {
         $validated = $req->validate([
             'userid'   => 'required|numeric',
@@ -40,30 +40,15 @@ class TopupController extends Controller
             'status'       => 'pending'
         ]);
 
-$response = Http::asJson()->post(
-    'https://v1.apigames.id/transaksi',
-    [
-        'ref_id'      => $orderId,
-        'merchant_id' => $this->apiId,
-        'produk'      => $validated['diamond'],
-        'tujuan'      => $validated['userid'].'|'.$validated['serverid'],
-        'signature'   => md5($this->apiId.$this->apiKey.$orderId),
-    ]
-);
+        $response = Http::post('https://v1.apigames.id/v2/transaksi', [
+            'ref_id'      => $orderId,
+            'merchant_id' => $this->apiId,
+            'produk'      => $validated['diamond'],
+            'tujuan'      => $req->userid,
+            'server_id'   => $req->serverid ?? '',
+            'signature'   => md5($this->apiId . ':' . $this->apiKey . ':' . $orderId),
+        ]);
 
-dd([
-    'request_payload' => [
-        'ref_id'      => $orderId,
-        'merchant_id' => $this->apiId,
-        'produk'      => $validated['diamond'],
-        'tujuan'      => $validated['userid'].'|'.$validated['serverid'],
-        'signature'   => md5($this->apiId.$this->apiKey.$orderId),
-    ],
-    'status'  => $response->status(),
-    'body'    => $response->body(),
-        $response->status(),
-    $response->json()
-]);
 
         return view('order-result', [
             'order_id'   => $orderId,

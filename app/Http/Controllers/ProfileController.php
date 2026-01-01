@@ -14,7 +14,7 @@ use Carbon\Carbon;
 
 class ProfileController extends Controller
 {
-    
+
     /**
      * Display the user's profile form.
      */
@@ -31,7 +31,7 @@ class ProfileController extends Controller
     public function show(Request $request)
     {
         $user = $request->user();
-        
+
         if (!$user) {
             return redirect()->route('login');
         }
@@ -41,15 +41,15 @@ class ProfileController extends Controller
         $orderStats = [
             'successful' => Transaksi::where('user_id', $userId)->whereNotNull('paid_at')->count(),
             'processing' => Transaksi::where('user_id', $userId)
-                                   ->whereNull('paid_at')
-                                   ->where(function($q) {
-                                       $q->where('midtrans_status', '!=', 'cancelled')
-                                         ->orWhereNull('midtrans_status');
-                                   })->count(),
+                ->whereNull('paid_at')
+                ->where(function ($q) {
+                    $q->where('midtrans_status', '!=', 'cancelled')
+                        ->orWhereNull('midtrans_status');
+                })->count(),
             'unpaid' => Transaksi::where('user_id', $userId)
-                               ->whereNull('paid_at')
-                               ->whereNull('midtrans_status')
-                               ->count(),
+                ->whereNull('paid_at')
+                ->whereNull('midtrans_status')
+                ->count(),
             'failed' => Transaksi::where('user_id', $userId)->where('midtrans_status', 'cancelled')->count(),
         ];
 
@@ -96,25 +96,20 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function show()
-    {
-        return view('profile.show', [
-            'user' => auth()->user(),
-        ]);
     /**
      * Display the user's transaction history with filtering.
      */
     public function history(Request $request)
     {
         $user = $request->user();
-        
+
         if (!$user) {
             return redirect()->route('login');
         }
 
         $query = Transaksi::with(['items.tipeItem', 'items.item.game', 'metodePembayaran'])
-                          ->where('user_id', $user->id)
-                          ->orderBy('created_at', 'desc');
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc');
 
         // Apply status filter
         if ($request->filled('status')) {
@@ -124,10 +119,10 @@ class ProfileController extends Controller
                     break;
                 case 'pending':
                     $query->whereNull('paid_at')
-                          ->where(function($q) {
-                              $q->where('midtrans_status', '!=', 'cancelled')
+                        ->where(function ($q) {
+                            $q->where('midtrans_status', '!=', 'cancelled')
                                 ->orWhereNull('midtrans_status');
-                          });
+                        });
                     break;
                 case 'failed':
                     $query->where('midtrans_status', 'cancelled');
@@ -148,16 +143,16 @@ class ProfileController extends Controller
 
         // Calculate summary stats - create separate queries for each calculation
         $userId = $user->id;
-        
+
         $summary = [
             'total' => Transaksi::where('user_id', $userId)->count(),
             'successful' => Transaksi::where('user_id', $userId)->whereNotNull('paid_at')->count(),
             'pending' => Transaksi::where('user_id', $userId)
-                                  ->whereNull('paid_at')
-                                  ->where(function($q) {
-                                      $q->where('midtrans_status', '!=', 'cancelled')
-                                        ->orWhereNull('midtrans_status');
-                                  })->count(),
+                ->whereNull('paid_at')
+                ->where(function ($q) {
+                    $q->where('midtrans_status', '!=', 'cancelled')
+                        ->orWhereNull('midtrans_status');
+                })->count(),
             'failed' => Transaksi::where('user_id', $userId)->where('midtrans_status', 'cancelled')->count(),
             'total_spent' => Transaksi::where('user_id', $userId)->whereNotNull('paid_at')->sum('total') ?: 0,
             'avg_transaction' => Transaksi::where('user_id', $userId)->whereNotNull('paid_at')->avg('total') ?: 0

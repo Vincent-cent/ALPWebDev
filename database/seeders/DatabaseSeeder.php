@@ -72,10 +72,10 @@ class ItemSeeder extends Seeder
 
         if ($mobileLegends && $diamond) {
             $mlItems = [
-                ['nama' => '5 Diamond', 'harga' => 1500, 'harga_coret' => 2000, 'discount_percent' => 25],
-                ['nama' => '12 Diamond', 'harga' => 3500, 'harga_coret' => 4500, 'discount_percent' => 22],
-                ['nama' => '19 Diamond', 'harga' => 5500, 'harga_coret' => 7000, 'discount_percent' => 21],
-                ['nama' => '28 Diamond', 'harga' => 8000, 'harga_coret' => 10000, 'discount_percent' => 20],
+                ['nama' => '55 Diamond', 'item_id' => 'ML55', 'harga' => 11700, 'harga_coret' => 13700, 'discount_percent' => 25],
+                ['nama' => '86 Diamond', 'item_id' => 'ML86', 'harga' => 18000, 'harga_coret' => 18450, 'discount_percent' => 22],
+                ['nama' => '165 Diamond', 'item_id' => 'ML165', 'harga' => 35070, 'harga_coret' => 37000, 'discount_percent' => 21],
+                ['nama' => '172 Diamond', 'item_id' => 'ML172', 'harga' => 36600, 'harga_coret' => 46000, 'discount_percent' => 20],
             ];
 
             foreach ($mlItems as $item) {

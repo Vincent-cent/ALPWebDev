@@ -170,6 +170,13 @@ class TransaksiController extends Controller
                     PromoCode::where('id', $promoId)->decrement('kuota');
                 }
                 
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'transaksi_id' => $transaksi->id,
+                        'message' => 'Payment successful with TOSHOP Saldo!'
+                    ]);
+                }
                 return redirect()->route('transaksi.success', $transaksi->id)
                     ->with('success', 'Payment successful with TOSHOP Saldo!');
             }
@@ -298,18 +305,45 @@ class TransaksiController extends Controller
                     ]);
                     
                     // Still create transaction but without snap token for debugging
+                    if ($request->wantsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Payment system initialization failed: ' . $e->getMessage(),
+                            'transaksi_id' => $transaksi->id,
+                        ], 500);
+                    }
                     return redirect()->route('transaksi.show', $transaksi->id)
                         ->with('error', 'Payment system initialization failed: ' . $e->getMessage());
                 }
                 
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'transaksi_id' => $transaksi->id,
+                        'message' => 'Transaksi berhasil dibuat!'
+                    ]);
+                }
                 return redirect()->route('transaksi.show', $transaksi->id)
                     ->with('success', 'Transaksi berhasil dibuat!');
             });
             
         } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $e->errors()
+                ], 422);
+            }
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             \Log::error('Transaction creation failed: ' . $e->getMessage());
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat membuat transaksi. Silakan coba lagi. ' . $e->getMessage()
+                ], 500);
+            }
             return back()->with('error', 'Terjadi kesalahan saat membuat transaksi. Silakan coba lagi.')
                         ->withInput();
         }

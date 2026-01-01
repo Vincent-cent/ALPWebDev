@@ -15,6 +15,9 @@ class Transaksi extends Model
         'midtrans_va_number',
         'midtrans_payment_type',
         'midtrans_status',
+        'apigames_order_id',
+        'apigames_status',
+        'apigames_response',
         'total',
         'paid_at',
         'expired_at',
@@ -24,6 +27,7 @@ class Transaksi extends Model
         'paid_at' => 'datetime',
         'expired_at' => 'datetime',
         'total' => 'decimal:2',
+        'apigames_response' => 'array',
     ];
 
     // Accessor for legacy total_harga field name

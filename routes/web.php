@@ -15,14 +15,10 @@ use App\Http\Controllers\Admin\GameController as AdminGameController;
 use App\Http\Controllers\Admin\ItemController as AdminItemController;
 use App\Http\Controllers\Admin\TipeItemController;
 use App\Http\Controllers\Admin\MetodePembayaranController;
+use App\Http\Controllers\GameTransactionController;
 use App\Http\Controllers\LacakPesananController;
 
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
-
-
-Route::get('/topup', function () {
-    return view('topup');
-})->name('home');
 
 Route::get('/about', function () {
     return view('about');
@@ -31,7 +27,7 @@ Route::get('/about', function () {
 Route::get('/lacak-pesanan', [LacakPesananController::class, 'index'])->name('lacak-pesanan');
 Route::post('/lacak-pesanan', [LacakPesananController::class, 'track'])->name('lacak-pesanan.track');
 
-Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder'] );
+Route::post('/order', [App\Http\Controllers\TopupController::class, 'order'] );
 
 Route::get('/game/{id}', [GameDetailController::class, 'show'])->name('game.detail');
 Route::post('/promo/verify', [GameDetailController::class, 'verifyPromo'])->name('promo.verify');
@@ -41,6 +37,9 @@ Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaks
 Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
 Route::get('/transaksi/{id}/success', [TransaksiController::class, 'success'])->name('transaksi.success');
 Route::get('/transaksi/{id}/debug', [TransaksiController::class, 'debug'])->name('transaksi.debug');
+
+// Game Transaction to APIGames
+Route::post('/game/send-to-apigames', [GameTransactionController::class, 'sendToAPIGames'])->name('game.send-to-apigames');
 
 // Saldo Routes
 Route::middleware('auth')->group(function () {
@@ -147,4 +146,6 @@ Route::get('/topup', function () {
     return view('topup');
 });
 
-Route::post('/order', [ImpediaController::class, 'order']);
+Route::post('/order', [TopUpController::class, 'order'] );
+
+//Route::post('/order', [ImpediaController::class, 'order']);

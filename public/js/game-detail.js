@@ -33,15 +33,23 @@ class GameDetail {
 
     calculateTotal() {
         const itemRadio = document.querySelector('input[name="item_id"]:checked');
-        const paymentRadio = document.querySelector('input[name="metode_pembayaran_id"]:checked');
         
-        if (itemRadio && paymentRadio) {
-            const itemPrice = parseFloat(itemRadio.dataset.price);
-            const paymentFee = parseFloat(paymentRadio.dataset.fee);
-            const total = itemPrice + paymentFee;
+        if (itemRadio) {
+            const itemPrice = parseFloat(itemRadio.dataset.price) || 0;
             
-            document.querySelectorAll('.total-price').forEach(el => {
-                el.textContent = 'Rp. ' + total.toLocaleString('id-ID');
+            // Update total for each payment method
+            document.querySelectorAll('input[name="metode_pembayaran_id"]').forEach(paymentRadio => {
+                const paymentFee = parseFloat(paymentRadio.dataset.fee) || 0;
+                const total = itemPrice + paymentFee;
+                
+                // Find the total-price span in the same payment method container
+                const paymentLabel = paymentRadio.nextElementSibling; // label element
+                if (paymentLabel) {
+                    const totalPriceSpan = paymentLabel.querySelector('.total-price');
+                    if (totalPriceSpan) {
+                        totalPriceSpan.textContent = 'Rp. ' + total.toLocaleString('id-ID');
+                    }
+                }
             });
         }
     }
@@ -141,7 +149,10 @@ class GameDetail {
             return false;
         }
 
-        console.log('Form validation passed, submitting...');
+        console.log('Form validation passed, submitting via AJAX...');
+        
+        // Prevent default form submission
+        e.preventDefault();
 
         // Show loading state
         const submitBtn = form.querySelector('button[type="submit"]');
@@ -150,7 +161,82 @@ class GameDetail {
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
         }
 
-        return true;
+        // Get form data
+        const formData = new FormData(form);
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        // First, submit to create transaction
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json',
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || 'Transaction creation failed');
+                });
+            }
+            return response.json();
+        })
+        .then(transaksiData => {
+            console.log('Transaction created:', transaksiData);
+            
+            // Extract product ID from selected item
+            const selectedItem = form.querySelector('input[name="item_id"]:checked');
+            const itemId = selectedItem ? selectedItem.value : null;
+            
+            // Now send to APIGames
+            return fetch('/game/send-to-apigames', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    transaksi_id: transaksiData.transaksi_id || transaksiData.id,
+                    user_id: formData.get('user_id'),
+                    server_id: formData.get('server_id'),
+                    product_id: formData.get('item_id'), // Using item_id as product_id
+                })
+            });
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || 'APIGames request failed');
+                });
+            }
+            return response.json();
+        })
+        .then(apiResult => {
+            console.log('APIGames response:', apiResult);
+            
+            // Redirect to transaction success page or display result
+            if (apiResult.success) {
+                window.location.href = `/transaksi/${apiResult.transaksi_id}/success`;
+            } else {
+                alert('Terjadi kesalahan saat mengirim ke APIGames: ' + apiResult.message);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '🛒 <strong>Beli Sekarang</strong>';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan: ' + error.message);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '🛒 <strong>Beli Sekarang</strong>';
+            }
+        });
+
+        return false;
     }
 }
 

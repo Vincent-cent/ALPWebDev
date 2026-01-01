@@ -29,8 +29,9 @@
 <input type="text" name="serverid"><br><br>
 
 <label>Pilih Produk</label><br>
-<select name="product_id" required>
+<select name="diamond" required>
     <option value="">-- Pilih --</option>
+    <option value="ML55">Mobile Legends 55 Diamond</option>
     <option value="STEAM12-S55">Steam Wallet 12</option>
 </select><br><br>
 
