@@ -25,11 +25,8 @@
     </main>
 
     @include('layouts.components._footer')
-<<<<<<< HEAD
-=======
     
     @yield('scripts')
->>>>>>> c84f8aaf951ad36afde0f0955ac787acf022d9fc
     
 </body>
 </html>

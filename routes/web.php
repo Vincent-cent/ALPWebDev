@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\GameDetailController;
 use App\Http\Controllers\TransaksiController;
-<<<<<<< HEAD
 use App\Http\Controllers\ImpediaController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\OrderController;
@@ -16,10 +15,7 @@ use App\Http\Controllers\Admin\GameController as AdminGameController;
 use App\Http\Controllers\Admin\ItemController as AdminItemController;
 use App\Http\Controllers\Admin\TipeItemController;
 use App\Http\Controllers\Admin\MetodePembayaranController;
-=======
-use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\LacakPesananController;
->>>>>>> c84f8aaf951ad36afde0f0955ac787acf022d9fc
 
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
@@ -53,6 +49,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/saldo/success/{id}', [App\Http\Controllers\SaldoController::class, 'success'])->name('saldo.success');
 });
 
+// Notifikasi Routes
+Route::get('/notifikasi', [App\Http\Controllers\NotifikasiController::class, 'index'])->name('notifikasi.index');
+Route::get('/notifikasi/{notifikasi}', [App\Http\Controllers\NotifikasiController::class, 'show'])->name('notifikasi.show');
+
 // Callback Routes
 Route::post('/callback/saldo', [App\Http\Controllers\SaldoController::class, 'callback'])->name('saldo.callback');
 Route::post('/callback/transaksi', [App\Http\Controllers\TransaksiController::class, 'callback'])->name('transaksi.callback');
@@ -62,7 +62,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-<<<<<<< HEAD
     Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
 });
 
@@ -103,7 +102,6 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/admin/metode-pembayarans', [MetodePembayaranController::class, 'store'])->name('admin.metode-pembayarans.store');
     Route::put('/admin/metode-pembayarans/{id}', [MetodePembayaranController::class, 'update'])->name('admin.metode-pembayarans.update');
     Route::delete('/admin/metode-pembayarans/{id}', [MetodePembayaranController::class, 'destroy'])->name('admin.metode-pembayarans.destroy');
-=======
     
     // Profile Portal Routes
     Route::get('/profile/dashboard', [ProfileController::class, 'show'])->name('profile.show');
@@ -140,7 +138,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     // Payment Methods
     Route::resource('metode-pembayarans', App\Http\Controllers\Admin\MetodePembayaranController::class);
->>>>>>> c84f8aaf951ad36afde0f0955ac787acf022d9fc
 });
 
 require __DIR__.'/auth.php';

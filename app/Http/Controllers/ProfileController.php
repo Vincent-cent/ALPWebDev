@@ -96,13 +96,11 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-<<<<<<< HEAD
     public function show()
     {
         return view('profile.show', [
             'user' => auth()->user(),
         ]);
-=======
     /**
      * Display the user's transaction history with filtering.
      */
@@ -166,6 +164,5 @@ class ProfileController extends Controller
         ];
 
         return view('portal.user.profile.history', compact('transactions', 'summary'));
->>>>>>> c84f8aaf951ad36afde0f0955ac787acf022d9fc
     }
 }

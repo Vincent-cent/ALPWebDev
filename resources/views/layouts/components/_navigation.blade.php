@@ -34,6 +34,9 @@
                 <div class="nav-tooltip">Lacak Pesanan</div>
             </div>
 
+            <!-- Notification Dropdown -->
+            @include('layouts.components._notification-dropdown')
+
             @auth
                 <!-- Dashboard Icon for admin users -->
                 @if(auth()->user()->is_admin || auth()->user()->role === 'admin')
