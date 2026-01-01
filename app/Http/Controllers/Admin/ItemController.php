@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Item;
+use App\Models\Game;
+use App\Models\TipeItem;
+use Illuminate\Http\Request;
+
+class ItemController extends Controller
+{
+    public function index()
+    {
+        $items = Item::all();
+        return view('portal.admin.item.index', compact('items'));
+    }
+
+    public function create()
+    {
+        $games = Game::all();
+        $tipoItems = TipeItem::all();
+        return view('portal.admin.item.create', compact('games', 'tipoItems'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'item_id' => 'nullable|string|max:50',
+            'game_id' => 'required|exists:games,id',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'harga' => 'required|numeric|min:0',
+            'tipe_item_id' => 'nullable|exists:tipe_items,id',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('item'), $filename);
+            $validated['image'] = 'item/' . $filename;
+        }
+
+        Item::create($validated);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Item berhasil ditambahkan');
+    }
+
+    public function edit(Item $item)
+    {
+        $games = Game::all();
+        $tipoItems = TipeItem::all();
+        return view('portal.admin.item.edit', compact('item', 'games', 'tipoItems'));
+    }
+
+    public function update(Request $request, Item $item)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'item_id' => 'nullable|string|max:50',
+            'game_id' => 'required|exists:games,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'harga' => 'required|numeric|min:0',
+            'tipe_item_id' => 'nullable|exists:tipe_items,id',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($item->image && file_exists(public_path($item->image))) {
+                unlink(public_path($item->image));
+            }
+            
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('item'), $filename);
+            $validated['image'] = 'item/' . $filename;
+        }
+
+        $item->update($validated);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Item berhasil diperbarui');
+    }
+
+    public function destroy(Item $item)
+    {
+        // Delete image if exists
+        if ($item->image && file_exists(public_path($item->image))) {
+            unlink(public_path($item->image));
+        }
+
+        $item->delete();
+
+        return redirect()->route('admin.dashboard')->with('success', 'Item berhasil dihapus');
+    }
+}

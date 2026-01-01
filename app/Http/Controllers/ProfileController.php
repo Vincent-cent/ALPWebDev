@@ -11,6 +11,7 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    
     /**
      * Display the user's profile form.
      */
@@ -56,5 +57,12 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function show()
+    {
+        return view('profile.show', [
+            'user' => auth()->user(),
+        ]);
     }
 }

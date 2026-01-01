@@ -18,18 +18,13 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    
-{{-- 
-    @include('layouts.components._navigation')
+    @include('layouts.components.admin._admin_navigation')
 
-    <main class="flex-grow-1">
+    <main class="flex-grow-1" style="margin-top: 70px;">
         @yield('content')
     </main>
 
-    @include('layouts.components._footer') --}}
-    
-
-    
+    @include('layouts.components._footer')
     
 </body>
 </html>
