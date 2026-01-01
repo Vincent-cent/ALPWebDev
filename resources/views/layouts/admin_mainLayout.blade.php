@@ -14,7 +14,7 @@
           integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr2wGrXdLKS5BqgKrII7HfWVX2ZBj" 
           crossorigin="anonymous">
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css','resources/css/admin.css' ,'resources/js/app.js','resources/js/admin.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -25,6 +25,11 @@
     </main>
 
     @include('layouts.components._footer')
+<<<<<<< HEAD
+=======
+    
+    @yield('scripts')
+>>>>>>> c84f8aaf951ad36afde0f0955ac787acf022d9fc
     
 </body>
 </html>

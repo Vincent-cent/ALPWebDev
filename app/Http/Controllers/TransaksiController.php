@@ -202,7 +202,7 @@ class TransaksiController extends Controller
                     PromoCode::where('id', $promoId)->decrement('kuota');
                 }
                 
-                // Initialize Midtrans configuration
+                //  Midtrans configuration
                 \Midtrans\Config::$serverKey = config('midtrans.server_key');
                 \Midtrans\Config::$isProduction = config('midtrans.is_production');
                 \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
@@ -211,24 +211,29 @@ class TransaksiController extends Controller
                 // Disable SSL verification for local development
                 \Midtrans\Config::$curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
                 
-                // Configure enabled payments based on payment method type
+                // Configure enabled payments based on user's selection
                 $enabledPayments = [];
+                $paymentOptions = [];
                 
                 switch($metodePembayaran->type) {
                     case 'bank_transfer':
                         $enabledPayments = ['bank_transfer'];
+                        // For specific banks, we can specify which bank
+                        $bank = $this->getBankFromPaymentMethod($metodePembayaran->name);
+                        if ($bank) {
+                            $paymentOptions['bank_transfer'] = ['bank' => [$bank]];
+                        }
                         break;
                     case 'qris':
-                        $enabledPayments = ['qris'];
+                        // For QRIS, try multiple configurations to ensure compatibility
+                        $enabledPayments = ['qris', 'gopay', 'shopeepay'];
+                        break;
+                    case 'saldo':
+                        // Saldo payments are handled above, this shouldn't reach here
                         break;
                     default:
-                        // Show all available payment methods
-                        $enabledPayments = [
-                            'bank_transfer',
-                            'qris',
-                            'gopay',
-                            'shopeepay'
-                        ];
+                        // For unknown payment types, show bank transfer as fallback
+                        $enabledPayments = ['bank_transfer'];
                         break;
                 }
                 
@@ -244,15 +249,20 @@ class TransaksiController extends Controller
                     ],
                     'item_details' => [[
                         'id' => $item->id,
-                        'price' => (int) ($subtotal - $discount),
+                        'price' => (int) $total, // Total includes item price + admin fee - discount
                         'quantity' => 1,
-                        'name' => $item->nama,
+                        'name' => $item->nama . ' + Admin Fee',
                     ]],
                     'enabled_payments' => $enabledPayments,
                     'callbacks' => [
                         'finish' => route('transaksi.success', $transaksi->id),
                     ],
                 ];
+                
+                // Add payment options if specified
+                if (!empty($paymentOptions)) {
+                    $payload['payment_options'] = $paymentOptions;
+                }
                 
                 try {
                     Log::info('Creating Midtrans Snap token with payload:', $payload);
@@ -408,5 +418,26 @@ class TransaksiController extends Controller
             Log::error('Midtrans callback error: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
+    }
+    
+    /**
+     * Map payment method name to Midtrans bank code
+     */
+    private function getBankFromPaymentMethod($paymentMethodName)
+    {
+        $bankMapping = [
+            'BCA Virtual Account' => 'bca',
+            'BRI Virtual Account' => 'bri',
+            'BNI Virtual Account' => 'bni',
+            'Mandiri Virtual Account' => 'echannel',
+            'Permata Virtual Account' => 'permata',
+            'BNC Virtual Account' => 'other',
+            'Danamon Virtual Account' => 'other',
+            'CIMB Virtual Account' => 'cimb',
+            'BSI Virtual Account' => 'other',
+            'BTN Virtual Account' => 'other',
+        ];
+        
+        return $bankMapping[$paymentMethodName] ?? null;
     }
 }

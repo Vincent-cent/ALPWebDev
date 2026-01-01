@@ -28,13 +28,23 @@
 
             <!-- Track Order Icon -->
             <div class="nav-icon-container position-relative">
-                <a href="{{ route('about') }}" class="nav-icon {{ request()->routeIs('about') ? 'active' : '' }}">
+                <a href="{{ route('lacak-pesanan') }}" class="nav-icon {{ request()->routeIs('lacak-pesanan') ? 'active' : '' }}">
                     <i class="fas fa-search-location" title="Track Order"></i>
                 </a>
                 <div class="nav-tooltip">Lacak Pesanan</div>
             </div>
 
             @auth
+                <!-- Dashboard Icon for admin users -->
+                @if(auth()->user()->is_admin || auth()->user()->role === 'admin')
+                <div class="nav-icon-container position-relative">
+                    <a href="{{ route('admin.dashboard') }}" class="nav-icon {{ request()->routeIs('admin.*') ? 'active' : '' }}">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </a>
+                    <div class="nav-tooltip">Dashboard</div>
+                </div>
+                @endif
+                
                 <!-- Profile Icon for authenticated users -->
                 <div class="nav-icon-container position-relative">
                     <a href="{{ route('profile.show') }}" class="nav-icon {{ request()->routeIs('profile.*') ? 'active' : '' }}">

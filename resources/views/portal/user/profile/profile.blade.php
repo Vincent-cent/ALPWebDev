@@ -13,6 +13,14 @@
                     <h2 class="text-white fw-bold mb-0">PROFIL</h2>
                 </div>
 
+                <!-- Success Message -->
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show border-0 rounded-pill mb-4" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 <!-- Main Profile Card -->
                 <div class="row g-4">
                     <div class="col-lg-8">
@@ -42,21 +50,15 @@
                                             </button>
                                         </div>
                                         <p class="text-white-50 mb-1">
-                                            <i class="fas fa-phone me-2"></i>{{ auth()->user()->phone ?? '628xxxxxxxxx' }}
-                                        </p>
-                                        <p class="text-white-50 mb-1">
                                             <i class="fas fa-envelope me-2"></i>{{ auth()->user()->email }}
                                         </p>
                                         <p class="text-white-50 mb-1">
                                             <i class="fas fa-crown me-2"></i>MEMBER
                                         </p>
-                                        <p class="text-white-50 mb-0">
-                                            <i class="fas fa-arrow-down me-2"></i>0 Downline
-                                        </p>
                                     </div>
                                 </div>
 
-                                <!-- Referral Code Section -->
+                                {{-- <!-- Referral Code Section -->
                                 <div class="card border-0 mb-4" style="background: rgba(44, 62, 80, 0.8); border-radius: 15px;">
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -73,7 +75,7 @@
                                             <i class="fas fa-gift me-2"></i>Ayok, Bagikan Kode Referralmu Sekarang!
                                         </p>
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <!-- Balance Section -->
                                 <div class="card border-0 mb-4" style="background: rgba(44, 62, 80, 0.8); border-radius: 15px;">
@@ -104,25 +106,25 @@
                                         <div class="row text-center">
                                             <div class="col-3">
                                                 <div class="mb-2">
-                                                    <h2 class="text-white fw-bold mb-0">71</h2>
+                                                    <h2 class="text-white fw-bold mb-0">{{ $orderStats['successful'] }}</h2>
                                                     <small class="text-white-50">Sukses</small>
                                                 </div>
                                             </div>
                                             <div class="col-3">
                                                 <div class="mb-2">
-                                                    <h2 class="text-white fw-bold mb-0">0</h2>
+                                                    <h2 class="text-white fw-bold mb-0">{{ $orderStats['processing'] }}</h2>
                                                     <small class="text-white-50">Proses</small>
                                                 </div>
                                             </div>
                                             <div class="col-3">
                                                 <div class="mb-2">
-                                                    <h2 class="text-white fw-bold mb-0">0</h2>
+                                                    <h2 class="text-white fw-bold mb-0">{{ $orderStats['unpaid'] }}</h2>
                                                     <small class="text-white-50">Belum Dibayar</small>
                                                 </div>
                                             </div>
                                             <div class="col-3">
                                                 <div class="mb-2">
-                                                    <h2 class="text-white fw-bold mb-0">2</h2>
+                                                    <h2 class="text-white fw-bold mb-0">{{ $orderStats['failed'] }}</h2>
                                                     <small class="text-white-50">Gagal/Refund</small>
                                                 </div>
                                             </div>
@@ -136,25 +138,52 @@
                                         <h5 class="text-white fw-bold mb-4">
                                             <i class="fas fa-id-card me-2"></i>User ID Saya
                                         </h5>
-                                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3" 
-                                             style="background: rgba(52, 73, 94, 0.8);">
-                                            <div class="d-flex align-items-center">
-                                                <span class="text-white fw-semibold me-3">Honkai Star Rail</span>
-                                                <span class="text-white-50">800533280</span>
+                                        
+                                        @if($userGames->isNotEmpty())
+                                            @foreach($userGames as $userGame)
+                                                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-3" 
+                                                     style="background: rgba(52, 73, 94, 0.8);">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="text-white fw-semibold me-3">{{ $userGame->game->name ?? 'Unknown Game' }}</span>
+                                                        <span class="text-white-50">{{ $userGame->user_game_uid }}</span>
+                                                        @if($userGame->nickname)
+                                                            <span class="badge bg-info ms-2">{{ $userGame->nickname }}</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <a href="{{ route('usergame.edit', $userGame->id) }}" 
+                                                           class="btn btn-sm btn-outline-primary rounded-circle" 
+                                                           style="width: 35px; height: 35px;">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('usergame.destroy', $userGame->id) }}" 
+                                                              method="POST" 
+                                                              style="display: inline;" 
+                                                              onsubmit="return confirm('Yakin ingin menghapus Game ID ini?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" 
+                                                                    class="btn btn-sm btn-outline-danger rounded-circle" 
+                                                                    style="width: 35px; height: 35px;">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="text-center py-4">
+                                                <i class="fas fa-gamepad fa-3x text-white-50 mb-3"></i>
+                                                <p class="text-white-50">Belum ada Game ID yang ditambahkan</p>
                                             </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <button class="btn btn-sm btn-outline-primary rounded-circle" style="width: 35px; height: 35px;">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger rounded-circle" style="width: 35px; height: 35px;">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                                        @endif
+                                        
                                         <div class="text-center mt-3">
-                                            <button class="btn rounded-pill px-4 py-2" style="background-color: #3498db; color: white;">
+                                            <a href="{{ route('usergame.create') }}" 
+                                               class="btn rounded-pill px-4 py-2" 
+                                               style="background-color: #3498db; color: white;">
                                                 <i class="fas fa-plus me-2"></i>Tambah Game ID
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

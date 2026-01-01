@@ -20,6 +20,36 @@ class Transaksi extends Model
         'expired_at',
     ];
 
+    protected $casts = [
+        'paid_at' => 'datetime',
+        'expired_at' => 'datetime',
+        'total' => 'decimal:2',
+    ];
+
+    // Accessor for legacy total_harga field name
+    public function getTotalHargaAttribute()
+    {
+        return $this->total;
+    }
+
+    // Accessor for order_id
+    public function getOrderIdAttribute()
+    {
+        return $this->midtrans_order_id ?? 'TRX-' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
+    }
+
+    // Status accessor
+    public function getStatusAttribute()
+    {
+        if ($this->paid_at) {
+            return 'paid';
+        } elseif ($this->midtrans_status === 'cancelled') {
+            return 'cancelled';
+        } else {
+            return 'unpaid';
+        }
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class)->withDefault([

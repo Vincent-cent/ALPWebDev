@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserGameController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\GameDetailController;
 use App\Http\Controllers\TransaksiController;
+<<<<<<< HEAD
 use App\Http\Controllers\ImpediaController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\OrderController;
@@ -14,6 +16,10 @@ use App\Http\Controllers\Admin\GameController as AdminGameController;
 use App\Http\Controllers\Admin\ItemController as AdminItemController;
 use App\Http\Controllers\Admin\TipeItemController;
 use App\Http\Controllers\Admin\MetodePembayaranController;
+=======
+use App\Http\Controllers\BerandaController;
+use App\Http\Controllers\LacakPesananController;
+>>>>>>> c84f8aaf951ad36afde0f0955ac787acf022d9fc
 
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
@@ -26,15 +32,10 @@ Route::get('/about', function () {
     return view('about');
 })->name('about');
 
-Route::get('/contact', function () {
-    return view('contact');
-})->name('contact');
+Route::get('/lacak-pesanan', [LacakPesananController::class, 'index'])->name('lacak-pesanan');
+Route::post('/lacak-pesanan', [LacakPesananController::class, 'track'])->name('lacak-pesanan.track');
 
 Route::post('/order', [App\Http\Controllers\TopupController::class, 'createOrder'] );
-
-// Route::get('/beranda', function () {
-//     return view('beranda');
-// })->middleware(['auth', 'verified'])->name('beranda');
 
 Route::get('/game/{id}', [GameDetailController::class, 'show'])->name('game.detail');
 Route::post('/promo/verify', [GameDetailController::class, 'verifyPromo'])->name('promo.verify');
@@ -61,6 +62,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+<<<<<<< HEAD
     Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
 });
 
@@ -101,6 +103,44 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/admin/metode-pembayarans', [MetodePembayaranController::class, 'store'])->name('admin.metode-pembayarans.store');
     Route::put('/admin/metode-pembayarans/{id}', [MetodePembayaranController::class, 'update'])->name('admin.metode-pembayarans.update');
     Route::delete('/admin/metode-pembayarans/{id}', [MetodePembayaranController::class, 'destroy'])->name('admin.metode-pembayarans.destroy');
+=======
+    
+    // Profile Portal Routes
+    Route::get('/profile/dashboard', [ProfileController::class, 'show'])->name('profile.show');
+    
+    Route::get('/profile/history', [ProfileController::class, 'history'])->name('profile.history');
+    
+    Route::get('/profile/saldo-topup', function () {
+        return view('portal.user.profile.saldo-topup');
+    })->name('profile.saldo-topup');
+
+    // UserGame CRUD Routes
+    Route::get('/profile/game/create', [UserGameController::class, 'create'])->name('usergame.create');
+    Route::post('/profile/game', [UserGameController::class, 'store'])->name('usergame.store');
+    Route::get('/profile/game/{userGame}/edit', [UserGameController::class, 'edit'])->name('usergame.edit');
+    Route::put('/profile/game/{userGame}', [UserGameController::class, 'update'])->name('usergame.update');
+    Route::delete('/profile/game/{userGame}', [UserGameController::class, 'destroy'])->name('usergame.destroy');
+});
+
+// Admin Routes
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Promo Codes
+    Route::resource('promo-codes', App\Http\Controllers\Admin\PromoCodeController::class);
+    
+    // Banner Promos
+    Route::resource('banner-promos', App\Http\Controllers\Admin\BannerPromoController::class);
+    
+    // Promo Notifications
+    Route::resource('promo-notifikasi', App\Http\Controllers\Admin\PromoNotifikasiController::class);
+    
+    // Transactions
+    Route::resource('transaksi', App\Http\Controllers\Admin\TransaksiController::class);
+    
+    // Payment Methods
+    Route::resource('metode-pembayarans', App\Http\Controllers\Admin\MetodePembayaranController::class);
+>>>>>>> c84f8aaf951ad36afde0f0955ac787acf022d9fc
 });
 
 require __DIR__.'/auth.php';
