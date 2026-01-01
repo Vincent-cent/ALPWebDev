@@ -2,6 +2,10 @@
 
 @section('title', 'Top Up Saldo - TOSHOP')
 
+@section('head')
+    <link href="{{ asset('css/saldo-topup.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
 <div class="min-vh-100" style="background: linear-gradient(135deg, #2c3e50, #34495e); padding-top: 2rem; padding-bottom: 2rem;">
     <div class="container">
@@ -13,11 +17,28 @@
                     <h2 class="text-white fw-bold mb-0 ms-3">TOP UP</h2>
                 </div>
 
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <!-- Main Content -->
                 <div class="row g-4">
                     <div class="col-lg-8">
                         <form method="POST" action="{{ route('saldo.topup') }}">
                             @csrf
+                            <input type="hidden" name="metode_pembayaran_id" id="metode_pembayaran_id" value="">
                             <div class="card border-0 shadow-lg" style="background: rgba(52, 73, 94, 0.9); border-radius: 20px;">
                             <div class="card-body p-4">
                                 <!-- Nominal Input Section -->
@@ -27,14 +48,14 @@
                                         <span class="input-group-text bg-transparent border-0 text-white fw-semibold" 
                                               style="background-color: rgba(44, 62, 80, 0.8) !important;">Rp.</span>
                                         <input type="number" name="amount" class="form-control border-0 py-3" 
-                                               placeholder="Nominal" value="{{ old('amount') }}" min="100000" required
+                                               placeholder="Nominal" value="{{ old('amount') }}" min="10000" required
                                                style="background-color: rgba(44, 62, 80, 0.8); color: white; border-radius: 0 10px 10px 0 !important;">
                                         <button class="btn text-white" style="background-color: rgba(44, 62, 80, 0.8);" type="button">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </div>
                                     <small class="text-warning fw-semibold mt-2 d-block">
-                                        <i class="fas fa-info-circle me-1"></i>Minimal Top-Up Harus Lebih Dari Rp. 100.000 !
+                                        <i class="fas fa-info-circle me-1"></i>Minimal Top-Up Harus Lebih Dari Rp. 10.000 !
                                     </small>
                                 </div>
 
@@ -47,6 +68,7 @@
                                         <!-- BCA -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="1"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-primary rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -58,9 +80,9 @@
                                             </div>
                                         </div>
 
-                                        <!-- BRI -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="2"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-info rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -72,9 +94,9 @@
                                             </div>
                                         </div>
 
-                                        <!-- BNI -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="3"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-warning rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -86,9 +108,9 @@
                                             </div>
                                         </div>
 
-                                        <!-- MANDIRI -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="4"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-warning rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -103,6 +125,7 @@
                                         <!-- PERMATA -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="5"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-success rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -117,6 +140,7 @@
                                         <!-- BNC -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="6"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-warning rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -131,6 +155,7 @@
                                         <!-- DANAMON -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="7"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-primary rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -145,6 +170,7 @@
                                         <!-- CIMB -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="8"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-danger rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -159,6 +185,7 @@
                                         <!-- BSI -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="9"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-success rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -173,6 +200,7 @@
                                         <!-- BTN -->
                                         <div class="col-md-4 col-sm-6">
                                             <div class="card border-0 h-100 payment-method" 
+                                                 data-method-id="10"
                                                  style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                                 <div class="card-body p-3 text-center">
                                                     <div class="bg-primary rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -193,6 +221,7 @@
                                     </h4>
                                     <div class="col-md-4">
                                         <div class="card border-0 payment-method" 
+                                             data-method-id="11"
                                              style="background: rgba(44, 62, 80, 0.8); border-radius: 15px; cursor: pointer; transition: all 0.3s ease;">
                                             <div class="card-body p-3 text-center">
                                                 <div class="bg-info rounded mb-2 d-flex align-items-center justify-content-center" style="height: 40px;">
@@ -234,42 +263,8 @@
 <!-- Include Profile Navbar -->
 @include('layouts.components.profile._profile_navbar')
 
-<style>
-.payment-method:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
-    background: rgba(255, 226, 146, 0.1) !important;
-}
+@endsection
 
-.payment-method.selected {
-    border: 2px solid #FFE292 !important;
-    background: rgba(255, 226, 146, 0.2) !important;
-}
-
-.form-control:focus {
-    background-color: rgba(44, 62, 80, 0.9) !important;
-    border-color: #FFE292 !important;
-    box-shadow: 0 0 0 0.2rem rgba(255, 226, 146, 0.25) !important;
-    color: white !important;
-}
-
-.form-control::placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentMethods = document.querySelectorAll('.payment-method');
-    
-    paymentMethods.forEach(method => {
-        method.addEventListener('click', function() {
-            // Remove selected class from all methods
-            paymentMethods.forEach(m => m.classList.remove('selected'));
-            // Add selected class to clicked method
-            this.classList.add('selected');
-        });
-    });
-});
-</script>
+@section('scripts')
+    <script src="{{ asset('js/saldo-topup.js') }}"></script>
 @endsection

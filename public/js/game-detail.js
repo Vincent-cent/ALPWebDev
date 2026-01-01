@@ -19,7 +19,6 @@ class GameDetail {
             radio.addEventListener('change', () => this.calculateTotal());
         });
 
-        // Promo code verification
         const checkPromoBtn = document.getElementById('checkPromoBtn');
         if (checkPromoBtn) {
             checkPromoBtn.addEventListener('click', () => this.verifyPromoCode());
@@ -155,7 +154,6 @@ class GameDetail {
     }
 }
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     new GameDetail();
 });

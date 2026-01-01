@@ -1,0 +1,21 @@
+.payment-method:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+    background: rgba(255, 226, 146, 0.1) !important;
+}
+
+.payment-method.selected {
+    border: 2px solid #FFE292 !important;
+    background: rgba(255, 226, 146, 0.2) !important;
+}
+
+.form-control:focus {
+    background-color: rgba(44, 62, 80, 0.9) !important;
+    border-color: #FFE292 !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 226, 146, 0.25) !important;
+    color: white !important;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}

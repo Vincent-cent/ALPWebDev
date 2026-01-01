@@ -15,8 +15,11 @@ class SaldoController extends Controller
     public function topup(Request $request)
     {
         try {
+            // Debug: Log incoming request data
+            Log::info('SaldoController@topup called with data: ', $request->all());
+            
             $request->validate([
-                'amount' => 'required|numeric|min:100000', // Minimum 100k
+                'amount' => 'required|numeric|min:10000', // Minimum 10k
                 'metode_pembayaran_id' => 'required|exists:metode_pembayarans,id',
                 'phone' => 'required|string',
             ]);
@@ -51,7 +54,7 @@ class SaldoController extends Controller
 
                 // Create transaksi item for saldo top-up
                 $transaksi->items()->create([
-                    'tipe_item_id' => null, // Special case for saldo top-up
+                    'tipe_item_id' => null, // Special case for saldo top-up (now allowed to be null)
                     'quantity' => 1,
                     'price' => $amount,
                     'promo_code_id' => null,
@@ -63,7 +66,7 @@ class SaldoController extends Controller
                 \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
                 \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
 
-                // Create Midtrans transaction
+                // Create Midtrans transaction payload
                 $payload = [
                     'transaction_details' => [
                         'order_id' => $orderId,
@@ -76,23 +79,35 @@ class SaldoController extends Controller
                     ],
                     'item_details' => [[
                         'id' => 'saldo-topup',
-                        'price' => (int) $amount,
+                        'price' => (int) $total, // Include admin fee in the price shown to customer
                         'quantity' => 1,
-                        'name' => 'TOSHOP Saldo Top-up Rp ' . number_format($amount),
+                        'name' => 'TOSHOP Saldo Top-up Rp ' . number_format($amount) . ' + Admin Fee',
                     ]],
                 ];
+
+                // Set specific payment methods based on selected method
+                if ($metodePembayaran->type === 'bank_transfer') {
+                    $bankName = $this->getBankFromPaymentMethod($metodePembayaran->name);
+                    $payload['enabled_payments'] = [$bankName];
+                } elseif ($metodePembayaran->type === 'qris') {
+                    // Include e-wallet options that support QR codes
+                    $payload['enabled_payments'] = ['qris', 'gopay', 'shopeepay'];
+                }
 
                 try {
                     $snapToken = \Midtrans\Snap::getSnapToken($payload);
                     $transaksi->update([
                         'midtrans_transaction_id' => $snapToken,
                     ]);
+
+                    return redirect()->route('saldo.payment', $transaksi->id)
+                        ->with('success', 'Top-up request created successfully!');
+                        
                 } catch (\Exception $e) {
                     Log::error('Midtrans error: ' . $e->getMessage());
+                    return back()->with('error', 'Failed to create payment. Please try again.')
+                        ->withInput();
                 }
-
-                return redirect()->route('saldo.payment', $transaksi->id)
-                    ->with('success', 'Top-up request created successfully!');
             });
 
         } catch (\Exception $e) {
@@ -169,5 +184,26 @@ class SaldoController extends Controller
             Log::error('Saldo callback error: ' . $e->getMessage());
             return response('Error', 500);
         }
+    }
+
+    /**
+     * Get Midtrans bank code from payment method name
+     */
+    private function getBankFromPaymentMethod($paymentMethodName)
+    {
+        $bankMappings = [
+            'BCA Virtual Account' => 'bca_va',
+            'BRI Virtual Account' => 'bri_va', 
+            'BNI Virtual Account' => 'bni_va',
+            'Mandiri Virtual Account' => 'echannel',
+            'Permata Virtual Account' => 'permata_va',
+            'BNC Virtual Account' => 'other_va',
+            'Danamon Virtual Account' => 'danamon_va',
+            'CIMB Virtual Account' => 'cimb_va',
+            'BSI Virtual Account' => 'other_va',
+            'BTN Virtual Account' => 'other_va',
+        ];
+
+        return $bankMappings[$paymentMethodName] ?? 'other_va';
     }
 }

@@ -16,6 +16,13 @@ class PromoCode extends Model
         'discount_percent',
     ];
 
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
+        'discount_amount' => 'decimal:2',
+        'discount_percent' => 'decimal:2',
+    ];
+
     public function tipeItem()
     {
         return $this->belongsTo(TipeItem::class);

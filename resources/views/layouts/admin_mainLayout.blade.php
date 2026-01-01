@@ -14,22 +14,19 @@
           integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr2wGrXdLKS5BqgKrII7HfWVX2ZBj" 
           crossorigin="anonymous">
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css','resources/css/admin.css' ,'resources/js/app.js','resources/js/admin.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    
-{{-- 
-    @include('layouts.components._navigation')
+    @include('layouts.components.admin._admin_navigation')
 
     <main class="flex-grow-1">
         @yield('content')
     </main>
 
-    @include('layouts.components._footer') --}}
+    @include('layouts.components._footer')
     
-
-    
+    @yield('scripts')
     
 </body>
 </html>

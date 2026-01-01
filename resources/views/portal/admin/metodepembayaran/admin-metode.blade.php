@@ -1,6 +1,6 @@
 @extends('layouts.admin_mainLayout')
 
-@section('title', 'Banner Management')
+@section('title', 'Payment Methods Management')
 
 @section('content')
     @include('layouts.components.admin._admin_navigation')
@@ -8,9 +8,9 @@
     <main class="admin-main-content">
         <div class="container-fluid py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Banner Management</h1>
-                <a href="{{ route('admin.banner-promos.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Add New Banner
+                <h1>Payment Methods</h1>
+                <a href="{{ route('admin.metode-pembayarans.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Payment Method
                 </a>
             </div>
             
@@ -27,44 +27,46 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Image</th>
+                                    <th>Logo</th>
                                     <th>Name</th>
-                                    <th>Game</th>
-                                    <th>Order</th>
+                                    <th>Type</th>
+                                    <th>Fee</th>
                                     <th>Status</th>
                                     <th>Created</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($bannerPromos ?? [] as $banner)
+                                @forelse($metodePembayarans ?? [] as $metode)
                                 <tr>
                                     <td>
-                                        @if($banner->image)
-                                            <img src="{{ asset('storage/' . $banner->image) }}" 
-                                                 alt="{{ $banner->name }}" 
-                                                 style="width: 80px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                        @if($metode->logo)
+                                            <img src="{{ asset('storage/payment-methods/' . $metode->logo) }}" 
+                                                 alt="{{ $metode->name }}" 
+                                                 style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;">
                                         @else
                                             <div class="bg-light d-flex align-items-center justify-content-center" 
-                                                 style="width: 80px; height: 50px; border-radius: 4px;">
-                                                <i class="fas fa-image text-muted"></i>
+                                                 style="width: 40px; height: 40px; border-radius: 4px;">
+                                                <i class="fas fa-credit-card text-muted"></i>
                                             </div>
                                         @endif
                                     </td>
-                                    <td><strong>{{ $banner->name }}</strong></td>
-                                    <td>{{ $banner->game ? $banner->game->name : 'No Game' }}</td>
-                                    <td><span class="badge bg-secondary">{{ $banner->order ?? 0 }}</span></td>
+                                    <td><strong>{{ $metode->name }}</strong></td>
                                     <td>
-                                        <span class="badge bg-{{ $banner->is_active ? 'success' : 'secondary' }}">
-                                            {{ $banner->is_active ? 'Active' : 'Inactive' }}
+                                        <span class="badge bg-info">{{ ucfirst(str_replace('_', ' ', $metode->type ?? 'bank_transfer')) }}</span>
+                                    </td>
+                                    <td>Rp {{ number_format($metode->fee ?? 0) }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ $metode->is_active ? 'success' : 'secondary' }}">
+                                            {{ $metode->is_active ? 'Active' : 'Inactive' }}
                                         </span>
                                     </td>
-                                    <td>{{ $banner->created_at ? $banner->created_at->format('d M Y') : 'N/A' }}</td>
+                                    <td>{{ $metode->created_at ? $metode->created_at->format('d M Y') : 'N/A' }}</td>
                                     <td>
-                                        <a href="{{ route('admin.banner-promos.edit', $banner) }}" class="btn btn-sm btn-warning">
+                                        <a href="{{ route('admin.metode-pembayarans.edit', $metode) }}" class="btn btn-sm btn-warning">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.banner-promos.destroy', $banner) }}" method="POST" class="d-inline">
+                                        <form action="{{ route('admin.metode-pembayarans.destroy', $metode) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
@@ -75,7 +77,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="text-center">No banners found</td>
+                                    <td colspan="7" class="text-center">No payment methods found</td>
                                 </tr>
                                 @endforelse
                             </tbody>
