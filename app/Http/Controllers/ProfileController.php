@@ -14,7 +14,7 @@ use Carbon\Carbon;
 
 class ProfileController extends Controller
 {
-
+    
     /**
      * Display the user's profile form.
      */

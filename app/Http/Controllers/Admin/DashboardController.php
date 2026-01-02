@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaksi;
 use App\Models\PromoCode;
 use App\Models\BannerPromo;
+use App\Models\Game;
+use App\Models\Item;
 use App\Models\User;
 use Illuminate\Http\Request;
 

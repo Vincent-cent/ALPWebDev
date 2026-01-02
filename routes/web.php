@@ -6,9 +6,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\GameDetailController;
 use App\Http\Controllers\TransaksiController;
+<<<<<<< HEAD
 use App\Http\Controllers\TopUpController;
 use App\Http\Controllers\GameTransactionController;
+=======
+>>>>>>> origin/admin2
 use App\Http\Controllers\LacakPesananController;
+use App\Http\Controllers\ImpediaController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\TopUpController;
+use App\Http\Controllers\Admin\GameController as AdminGameController;
+use App\Http\Controllers\Admin\ItemController as AdminItemController;
+use App\Http\Controllers\Admin\TipeItemController;
+use App\Http\Controllers\Admin\MetodePembayaranController;
 
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
@@ -82,24 +93,35 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Payment Methods
     Route::resource('metode-pembayarans', App\Http\Controllers\Admin\MetodePembayaranController::class);
+    Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
 
-    // Games
-    Route::resource('games', App\Http\Controllers\Admin\GameController::class);
+    // Game CRUD Routes
+    Route::get('/games', [AdminGameController::class, 'index'])->name('games.index');
+    Route::get('/games/create', [AdminGameController::class, 'create'])->name('games.create');
+    Route::post('/games', [AdminGameController::class, 'store'])->name('games.store');
+    Route::get('/games/{game}/edit', [AdminGameController::class, 'edit'])->name('games.edit');
+    Route::put('/games/{game}', [AdminGameController::class, 'update'])->name('games.update');
+    Route::delete('/games/{game}', [AdminGameController::class, 'destroy'])->name('games.destroy');
 
-    // Items
-    Route::resource('items', App\Http\Controllers\Admin\ItemController::class);
+    // Item CRUD Routes
+    Route::get('/items', [AdminItemController::class, 'index'])->name('items.index');
+    Route::get('/items/create', [AdminItemController::class, 'create'])->name('items.create');
+    Route::post('/items', [AdminItemController::class, 'store'])->name('items.store');
+    Route::get('/items/{item}/edit', [AdminItemController::class, 'edit'])->name('items.edit');
+    Route::put('/items/{item}', [AdminItemController::class, 'update'])->name('items.update');
+    Route::delete('/items/{item}', [AdminItemController::class, 'destroy'])->name('items.destroy');
 
-    // Tipe Items
-    Route::resource('tipe-items', App\Http\Controllers\Admin\TipeItemController::class);
+    // Tipe Item Routes
+    Route::post('/tipe-items', [TipeItemController::class, 'store'])->name('tipe-items.store');
+    Route::put('/tipe-items/{id}', [TipeItemController::class, 'update'])->name('tipe-items.update');
+    Route::delete('/tipe-items/{id}', [TipeItemController::class, 'destroy'])->name('tipe-items.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 
 Route::get('/topup', function () {
     return view('topup');
 });
 
-Route::post('/order', [TopUpController::class, 'order']);
-
-//Route::post('/order', [ImpediaController::class, 'order']);
+Route::post('/order', [ImpediaController::class, 'order']);
