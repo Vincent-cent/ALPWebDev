@@ -1,4 +1,7 @@
 @extends('layouts.admin_mainLayout')
+
+@section('title', 'Admin Dashboard')
+
 @section('content')
     @include('layouts.components.admin._admin_navigation')
     

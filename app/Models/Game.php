@@ -11,11 +11,18 @@ class Game extends Model
         'description',
         'image',
         'tipe',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function items()
     {
-        return $this->hasMany(Item::class);
+        return $this->belongsToMany(Item::class, 'game_items', 'game_id', 'item_id')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
     }
 
     public function bannerPromos()

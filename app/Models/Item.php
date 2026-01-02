@@ -11,6 +11,7 @@ class Item extends Model
         'tipe_item_id',
         'nama',
         'item_id',
+        'tipe',
         'harga',
         'harga_coret',
         'discount_percent',
@@ -20,6 +21,13 @@ class Item extends Model
     public function game()
     {
         return $this->belongsTo(Game::class);
+    }
+
+    public function games()
+    {
+        return $this->belongsToMany(Game::class, 'game_items', 'item_id', 'game_id')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
     }
 
     public function tipeItem()

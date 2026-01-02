@@ -45,9 +45,9 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex align-items-center mb-2">
                                             <h3 class="text-white fw-bold mb-0 me-3">{{ auth()->user()->name }}</h3>
-                                            <button class="btn btn-sm rounded-pill" style="background-color: #3498db; color: white;">
+                                            <a href="{{ route('profile.edit') }}" class="btn btn-sm rounded-pill" style="background-color: #3498db; color: white;">
                                                 <i class="fas fa-edit me-1"></i>Edit
-                                            </button>
+                                            </a>
                                         </div>
                                         <p class="text-white-50 mb-1">
                                             <i class="fas fa-envelope me-2"></i>{{ auth()->user()->email }}

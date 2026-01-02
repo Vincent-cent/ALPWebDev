@@ -57,28 +57,25 @@ class ItemController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'item_id' => 'nullable|string|max:50',
-            'game_id' => 'required|exists:games,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'item_id' => 'nullable|string|max:255',
+            'tipe_item_id' => 'required|exists:tipe_items,id',
             'harga' => 'required|numeric|min:0',
-            'tipe_item_id' => 'nullable|exists:tipe_items,id',
+            'harga_coret' => 'nullable|numeric|min:0',
+            'discount_percent' => 'nullable|integer|min:0|max:100',
+            'tipe' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($item->image && file_exists(public_path($item->image))) {
-                unlink(public_path($item->image));
+            if ($item->image) {
+                \Storage::disk('public')->delete($item->image);
             }
-            
-            $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('item'), $filename);
-            $validated['image'] = 'item/' . $filename;
+            $validated['image'] = $request->file('image')->store('items', 'public');
         }
 
         $item->update($validated);
-
-        return redirect()->route('admin.dashboard')->with('success', 'Item berhasil diperbarui');
+        return redirect()->route('admin.games.index')->with('success', 'Item berhasil diupdate');
     }
 
     public function destroy(Item $item)

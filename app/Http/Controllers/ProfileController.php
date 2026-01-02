@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\Transaksi;
 use App\Models\UserGame;
+use App\Models\Game;
 use Carbon\Carbon;
 
 class ProfileController extends Controller
@@ -20,9 +21,68 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
+        $user = $request->user();
+        return view('portal.user.profile.editprofile', compact('user'));
+    }
+
+    /**
+     * Display the admin's profile edit form with games list.
+     */
+    public function editAdmin(Request $request): View
+    {
+        $user = $request->user();
+        $games = Game::with('items')->get();
+        return view('portal.admin.profile.admin-editprofile', compact('user', 'games'));
+    }
+
+    /**
+     * Display the admin's dashboard.
+     */
+    public function adminDashboard(Request $request): View
+    {
+        $user = $request->user();
+        // Calculate transaction statistics (if needed)
+        $userId = $user->id;
+        $orderStats = [
+            'successful' => Transaksi::where('user_id', $userId)->whereNotNull('paid_at')->count(),
+            'processing' => Transaksi::where('user_id', $userId)
+                ->whereNull('paid_at')
+                ->where(function ($q) {
+                    $q->where('midtrans_status', '!=', 'cancelled')
+                        ->orWhereNull('midtrans_status');
+                })->count(),
+        ];
+
+        return view('portal.admin.profile.dashboard', compact('user', 'orderStats'));
+    }
+
+    /**
+     * Update user profile.
+     */
+    public function update(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:8|confirmed',
         ]);
+
+        // Update name and email
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        // Update password if provided
+        if (!empty($validated['password'])) {
+            $user->update([
+                'password' => bcrypt($validated['password']),
+            ]);
+        }
+
+        return redirect()->route('profile.show')->with('success', 'Profil berhasil diperbarui');
     }
 
     /**
@@ -34,6 +94,11 @@ class ProfileController extends Controller
 
         if (!$user) {
             return redirect()->route('login');
+        }
+
+        // If admin, show admin dashboard
+        if ($user->role === 'admin') {
+            return $this->adminDashboard($request);
         }
 
         // Calculate transaction statistics
@@ -56,23 +121,7 @@ class ProfileController extends Controller
         // Get user's game accounts
         $userGames = UserGame::with('game')->where('user_id', $userId)->get();
 
-        return view('portal.user.profile.profile', compact('orderStats', 'userGames'));
-    }
-
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return view('portal.user.profile.profile', compact('user', 'orderStats', 'userGames'));
     }
 
     /**

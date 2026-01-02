@@ -6,16 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\GameDetailController;
 use App\Http\Controllers\TransaksiController;
-<<<<<<< HEAD
-use App\Http\Controllers\TopUpController;
-use App\Http\Controllers\GameTransactionController;
-=======
->>>>>>> origin/admin2
 use App\Http\Controllers\LacakPesananController;
 use App\Http\Controllers\ImpediaController;
-use App\Http\Controllers\GameController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\TopUpController;
 use App\Http\Controllers\Admin\GameController as AdminGameController;
 use App\Http\Controllers\Admin\ItemController as AdminItemController;
 use App\Http\Controllers\Admin\TipeItemController;
@@ -41,9 +33,6 @@ Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('trans
 Route::get('/transaksi/{id}/success', [TransaksiController::class, 'success'])->name('transaksi.success');
 Route::get('/transaksi/{id}/debug', [TransaksiController::class, 'debug'])->name('transaksi.debug');
 
-// Game Transaction to APIGames
-Route::post('/game/send-to-apigames', [GameTransactionController::class, 'sendToAPIGames'])->name('game.send-to-apigames');
-
 // Saldo Routes
 Route::middleware('auth')->group(function () {
     Route::post('/saldo/topup', [App\Http\Controllers\SaldoController::class, 'topup'])->name('saldo.topup');
@@ -60,20 +49,25 @@ Route::post('/callback/saldo', [App\Http\Controllers\SaldoController::class, 'ca
 Route::post('/callback/transaksi', [App\Http\Controllers\TransaksiController::class, 'callback'])->name('transaksi.callback');
 
 // Profile Portal Routes
-Route::get('/profile/dashboard', [ProfileController::class, 'show'])->name('profile.show');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile/dashboard', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/history', [ProfileController::class, 'history'])->name('profile.history');
+    Route::get('/profile/saldo-topup', function () {
+        return view('portal.user.profile.saldo-topup');
+    })->name('profile.saldo-topup');
+    
+    // Admin profile edit
+    Route::get('/profile/admin/admin-editprofile', [ProfileController::class, 'editAdmin'])->name('profile.admin.admin-editprofile');
 
-Route::get('/profile/history', [ProfileController::class, 'history'])->name('profile.history');
-
-Route::get('/profile/saldo-topup', function () {
-    return view('portal.user.profile.saldo-topup');
-})->name('profile.saldo-topup');
-
-// UserGame CRUD Routes
-Route::get('/profile/game/create', [UserGameController::class, 'create'])->name('usergame.create');
-Route::post('/profile/game', [UserGameController::class, 'store'])->name('usergame.store');
-Route::get('/profile/game/{userGame}/edit', [UserGameController::class, 'edit'])->name('usergame.edit');
-Route::put('/profile/game/{userGame}', [UserGameController::class, 'update'])->name('usergame.update');
-Route::delete('/profile/game/{userGame}', [UserGameController::class, 'destroy'])->name('usergame.destroy');
+    // UserGame CRUD Routes
+    Route::get('/profile/game/create', [UserGameController::class, 'create'])->name('usergame.create');
+    Route::post('/profile/game', [UserGameController::class, 'store'])->name('usergame.store');
+    Route::get('/profile/game/{userGame}/edit', [UserGameController::class, 'edit'])->name('usergame.edit');
+    Route::put('/profile/game/{userGame}', [UserGameController::class, 'update'])->name('usergame.update');
+    Route::delete('/profile/game/{userGame}', [UserGameController::class, 'destroy'])->name('usergame.destroy');
+});
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
@@ -83,7 +77,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('promo-codes', App\Http\Controllers\Admin\PromoCodeController::class);
 
     // Banner Promos
-    Route::resource('banners', App\Http\Controllers\Admin\BannerPromoController::class);
+    Route::resource('banner-promos', App\Http\Controllers\Admin\BannerPromoController::class);
 
     // Promo Notifications
     Route::resource('promo-notifikasi', App\Http\Controllers\Admin\PromoNotifikasiController::class);
@@ -93,7 +87,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Payment Methods
     Route::resource('metode-pembayarans', App\Http\Controllers\Admin\MetodePembayaranController::class);
-    Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
 
     // Game CRUD Routes
     Route::get('/games', [AdminGameController::class, 'index'])->name('games.index');
@@ -102,6 +95,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/games/{game}/edit', [AdminGameController::class, 'edit'])->name('games.edit');
     Route::put('/games/{game}', [AdminGameController::class, 'update'])->name('games.update');
     Route::delete('/games/{game}', [AdminGameController::class, 'destroy'])->name('games.destroy');
+    Route::post('/games/{game}/items', [AdminGameController::class, 'addItem'])->name('games.addItem');
+    Route::put('/games/{game}/items/{item}/quantity', [AdminGameController::class, 'updateItemQuantity'])->name('games.updateItemQuantity');
+    Route::delete('/games/{game}/items/{item}', [AdminGameController::class, 'removeItem'])->name('games.removeItem');
 
     // Item CRUD Routes
     Route::get('/items', [AdminItemController::class, 'index'])->name('items.index');

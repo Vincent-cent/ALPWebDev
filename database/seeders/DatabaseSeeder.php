@@ -79,11 +79,11 @@ class ItemSeeder extends Seeder
             ];
 
             foreach ($mlItems as $item) {
-                Item::create(array_merge($item, [
-                    'game_id' => $mobileLegends->id,
+                $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $diamond->id,
                     'image' => 'items/placeholder.jpg',
                 ]));
+                $mobileLegends->items()->attach($createdItem->id, ['quantity' => 1]);
             }
         }
 
@@ -94,11 +94,11 @@ class ItemSeeder extends Seeder
             ];
 
             foreach ($ffItems as $item) {
-                Item::create(array_merge($item, [
-                    'game_id' => $freeFire->id,
+                $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $diamond->id,
                     'image' => 'items/placeholder.jpg',
                 ]));
+                $freeFire->items()->attach($createdItem->id, ['quantity' => 1]);
             }
         }
 
@@ -109,11 +109,11 @@ class ItemSeeder extends Seeder
             ];
 
             foreach ($steamItems as $item) {
-                Item::create(array_merge($item, [
-                    'game_id' => $steam->id,
+                $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $voucher->id,
                     'image' => 'items/placeholder.jpg',
                 ]));
+                $steam->items()->attach($createdItem->id, ['quantity' => 1]);
             }
         }
     }
