@@ -1,11 +1,10 @@
-@extends('layouts.admin_mainLayout')
+@extends('layouts.mainLayout')
 
 @section('title', 'Edit Profile')
 
 @section('content')
-    @include('layouts.components.admin._admin_navigation')
     
-    <main class="admin-main-content">
+    <main class="main-content">
         <div class="container-fluid py-4">
             <div class="row mb-4">
                 <div class="col-12">
