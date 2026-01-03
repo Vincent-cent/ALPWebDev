@@ -25,36 +25,6 @@ class ProfileController extends Controller
         return view('portal.user.profile.editprofile', compact('user'));
     }
 
-    /**
-     * Display the admin's profile edit form with games list.
-     */
-    public function editAdmin(Request $request): View
-    {
-        $user = $request->user();
-        $games = Game::with('items')->get();
-        return view('portal.admin.profile.admin-editprofile', compact('user', 'games'));
-    }
-
-    /**
-     * Display the admin's dashboard.
-     */
-    public function adminDashboard(Request $request): View
-    {
-        $user = $request->user();
-        // Calculate transaction statistics (if needed)
-        $userId = $user->id;
-        $orderStats = [
-            'successful' => Transaksi::where('user_id', $userId)->whereNotNull('paid_at')->count(),
-            'processing' => Transaksi::where('user_id', $userId)
-                ->whereNull('paid_at')
-                ->where(function ($q) {
-                    $q->where('midtrans_status', '!=', 'cancelled')
-                        ->orWhereNull('midtrans_status');
-                })->count(),
-        ];
-
-        return view('portal.admin.profile.dashboard', compact('user', 'orderStats'));
-    }
 
     /**
      * Update user profile.
@@ -94,11 +64,6 @@ class ProfileController extends Controller
 
         if (!$user) {
             return redirect()->route('login');
-        }
-
-        // If admin, show admin dashboard
-        if ($user->role === 'admin') {
-            return $this->adminDashboard($request);
         }
 
         // Calculate transaction statistics
