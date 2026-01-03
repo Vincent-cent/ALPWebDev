@@ -7,6 +7,7 @@ use App\Models\Game;
 use App\Models\Item;
 use App\Models\TipeItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class GameController extends Controller
 {
@@ -61,7 +62,7 @@ class GameController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($game->image) {
-                \Storage::disk('public')->delete($game->image);
+                Storage::disk('public')->delete($game->image);
             }
             $validated['image'] = $request->file('image')->store('games', 'public');
         }
@@ -75,7 +76,7 @@ class GameController extends Controller
     {
         // Delete image if exists
         if ($game->image) {
-            \Storage::disk('public')->delete($game->image);
+            Storage::disk('public')->delete($game->image);
         }
 
         // Detach items

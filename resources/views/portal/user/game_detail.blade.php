@@ -66,8 +66,8 @@
             <div class="col-lg-3 col-md-4 mb-4">
                 <div class="p-3">
                     @php
-                        $imagePath = $game->image && file_exists(storage_path('app/public/' . $game->image)) 
-                            ? asset('storage/' . $game->image) 
+                        $imagePath = $game->image && file_exists(public_path($game->image)) 
+                            ? asset($game->image) 
                             : asset('/placeholder.jpg');
                     @endphp
                     <div class="mb-3">
@@ -136,8 +136,8 @@
                                                         <label class="btn btn-outline-primary w-100 text-start p-3 h-100" for="item-{{ $item->id }}" style="background-color: #e1e3e8; border: 2px solid #e1e3e8; border-radius: 12px;">
                                                             <div class="d-flex flex-column align-items-center text-center">
                                                                 @php
-                                                                    $itemImage = $item->image && file_exists(storage_path('app/public/' . $item->image))
-                                                                        ? asset('storage/' . $item->image)
+                                                                    $itemImage = $item->image && file_exists(public_path($item->image))
+                                                                        ? asset($item->image)
                                                                         : asset('images/placeholder.png');
                                                                 @endphp
                                                                 <div class="rounded mb-2 d-flex align-items-center justify-content-center" style="background-color: #2d2d44; width: 100%; height: 70px; overflow: hidden;">
@@ -196,8 +196,8 @@
                                         <label class="btn btn-outline-primary w-100 p-3" for="payment-{{ $metode->id }}" style="background-color: #f0f2f5; border: 2px solid #f0f2f5; border-radius: 12px;">
                                             <div class="d-flex flex-column align-items-center text-center">
                                                 @php
-                                                    $paymentLogo = $metode->logo && file_exists(storage_path('app/public/' . $metode->logo))
-                                                        ? asset('storage/' . $metode->logo)
+                                                    $paymentLogo = $metode->logo && file_exists(public_path($metode->logo))
+                                                        ? asset($metode->logo)
                                                         : asset('images/placeholder.png');
                                                 @endphp
                                                 <img src="{{ $paymentLogo }}" alt="{{ $metode->name }}" class="mb-2" style="height: 35px; object-fit: contain;">
@@ -296,5 +296,5 @@
 
 @section('scripts')
 
-    <script src="{{ asset('js/game-detail.js') }}"></script>
+    <script src="{{ asset('js/game-detail.js') }}?v={{ time() }}"></script>
 @endsection

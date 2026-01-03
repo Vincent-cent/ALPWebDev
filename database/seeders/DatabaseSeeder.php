@@ -81,7 +81,7 @@ class ItemSeeder extends Seeder
             foreach ($mlItems as $item) {
                 $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $diamond->id,
-                    'image' => 'items/placeholder.jpg',
+                    'image' => 'games/diamond.png',
                 ]));
                 $mobileLegends->items()->attach($createdItem->id, ['quantity' => 1]);
             }
@@ -96,7 +96,7 @@ class ItemSeeder extends Seeder
             foreach ($ffItems as $item) {
                 $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $diamond->id,
-                    'image' => 'items/placeholder.jpg',
+                    'image' => 'games/diamond.png',
                 ]));
                 $freeFire->items()->attach($createdItem->id, ['quantity' => 1]);
             }
@@ -111,7 +111,7 @@ class ItemSeeder extends Seeder
             foreach ($steamItems as $item) {
                 $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $voucher->id,
-                    'image' => 'items/placeholder.jpg',
+                    'image' => 'games/voucher.png',
                 ]));
                 $steam->items()->attach($createdItem->id, ['quantity' => 1]);
             }
@@ -127,19 +127,19 @@ class GameSeeder extends Seeder
             [
                 'name' => 'Mobile Legends',
                 'description' => 'Mobile Legends: Bang Bang adalah game MOBA 5v5 terbaik di perangkat mobile. Bergabunglah dengan teman-temanmu dalam pertempuran 5v5! 10 detik matchmaking, 10 menit pertempuran. Raih kemenangan dengan strategi tim terbaikmu!',
-                'image' => 'games/mobile-legends.jpg',
+                'image' => 'games/MobileLegends.jpg',
                 'tipe' => 'game',
             ],
             [
                 'name' => 'Free Fire',
                 'description' => 'Garena Free Fire adalah game battle royale terpopuler di mobile. Setiap pertempuran 10 menit menempatkan Anda di pulau terpencil dengan 49 pemain lainnya. Pemain bebas memilih posisi awal mereka, mengambil senjata dan perlengkapan, dan bertahan hidup.',
-                'image' => 'games/free-fire.jpg',
+                'image' => 'games/FreeFire.jpg',
                 'tipe' => 'game',
             ],
             [
                 'name' => 'Steam Wallet',
                 'description' => 'Steam Wallet Code dapat digunakan di Steam untuk pembelian Games, Software, DLC dan item komunitas Steam lainnya. Anda bisa membeli apa saja yang tersedia di Steam menggunakan Steam Wallet.',
-                'image' => 'games/steam.jpg',
+                'image' => 'games/Steam.jpg',
                 'tipe' => 'voucher',
             ],
         ];

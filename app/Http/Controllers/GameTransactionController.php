@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Transaksi;
+use App\Models\Item;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
@@ -29,15 +30,47 @@ class GameTransactionController extends Controller
         Log::info('GameTransactionController@sendToAPIGames called with data: ', $request->all());
         
         try {
+            // Validate input
             $validated = $request->validate([
-                'transaksi_id' => 'required|exists:transaksis,id',
+                'transaksi_id' => 'required|integer',
                 'user_id' => 'required|string',
                 'server_id' => 'nullable|string',
-                'product_id' => 'required|string',
+                'item_db_id' => 'required|integer',
             ]);
 
+            Log::info('Validated data: ', $validated);
+
             // Get transaction from database
-            $transaksi = Transaksi::findOrFail($validated['transaksi_id']);
+            $transaksi = Transaksi::find($validated['transaksi_id']);
+            if (!$transaksi) {
+                Log::error('Transaction not found: ' . $validated['transaksi_id']);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Transaksi tidak ditemukan'
+                ], 404);
+            }
+            
+            // Get the Item to retrieve the actual product code
+            $item = Item::find($validated['item_db_id']);
+            if (!$item) {
+                Log::error('Item not found: ' . $validated['item_db_id']);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Item tidak ditemukan'
+                ], 404);
+            }
+            
+            $productCode = $item->item_id; // This is the APIGames product code (e.g., "ML55", "FF5")
+            
+            if (!$productCode) {
+                Log::error('Product code not found for item: ' . $validated['item_db_id']);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kode produk tidak ditemukan untuk item ini'
+                ], 400);
+            }
+            
+            Log::info('Product code found: ' . $productCode);
             
             // Generate order ID
             $orderId = 'GAME-' . strtoupper(Str::random(10));
@@ -50,7 +83,7 @@ class GameTransactionController extends Controller
             Log::info('Sending to APIGames with:', [
                 'ref_id' => $orderId,
                 'merchant_id' => $this->apiId,
-                'produk' => $validated['product_id'],
+                'produk' => $productCode,
                 'tujuan' => $validated['user_id'],
                 'server_id' => $validated['server_id'] ?? '',
             ]);
@@ -59,7 +92,7 @@ class GameTransactionController extends Controller
             $response = Http::post('https://v1.apigames.id/v2/transaksi', [
                 'ref_id'      => $orderId,
                 'merchant_id' => $this->apiId,
-                'produk'      => $validated['product_id'],
+                'produk'      => $productCode,
                 'tujuan'      => $validated['user_id'],
                 'server_id'   => $validated['server_id'] ?? '',
                 'signature'   => md5($this->apiId . ':' . $this->apiKey . ':' . $orderId),

@@ -14,8 +14,8 @@
                                 <div class="d-flex align-items-center justify-content-center position-relative h-100">
                                     @foreach ($banners as $index => $banner)
                                         @php
-                                            $bannerImage = $banner->image && file_exists(storage_path('app/public/' . $banner->image))
-                                                ? asset('storage/' . $banner->image)
+                                            $bannerImage = $banner->image && file_exists(public_path($banner->image))
+                                                ? asset($banner->image)
                                                 : asset('/placeholder.jpg');
                                         @endphp
                                         <div class="banner-slide position-absolute {{ $index == 0 ? 'active center' : ($index == 1 ? 'right' : 'hidden') }}" 
@@ -78,8 +78,8 @@
                                         <div class="card-body p-3 text-center">
                                             <div class="position-relative mb-2">
                                                 @php
-                                                    $imagePath = $game->image && file_exists(storage_path('app/public/' . $game->image))
-                                                        ? asset('storage/' . $game->image)
+                                                    $imagePath = $game->image && file_exists(public_path($game->image))
+                                                        ? asset($game->image)
                                                         : asset('/placeholder.jpg');
                                                 @endphp
                                                 <img src="{{ $imagePath }}" alt="{{ $game->name }}"
@@ -125,8 +125,8 @@
                                         style="background: #2a3150; border-radius: 15px;">
                                         <div class="card-body p-3 text-center">
                                             @php
-                                                $voucherImage = $voucher->image && file_exists(storage_path("app/public/{$voucher->image}"))
-                                                    ? asset("storage/{$voucher->image}")
+                                                $voucherImage = $voucher->image && file_exists(public_path($voucher->image))
+                                                    ? asset($voucher->image)
                                                     : asset('/placeholder.jpg');
                                             @endphp
                                             <img src="{{ $voucherImage }}"
@@ -175,8 +175,8 @@
                                         <div class="card-body p-3 text-center">
                                             <div class="position-relative mb-2">
                                                 @php
-                                                    $gameImage = $game->image && file_exists(storage_path('app/public/' . $game->image))
-                                                        ? asset('storage/' . $game->image)
+                                                    $gameImage = $game->image && file_exists(public_path($game->image))
+                                                        ? asset($game->image)
                                                         : asset('/placeholder.jpg');
                                                 @endphp
                                                 <img src="{{ $gameImage }}"
@@ -219,8 +219,8 @@
                                 <div class="card border-0 shadow-sm"
                                     style="background: #2a3150; border-radius: 15px; overflow: hidden;">
                                     @php
-                                        $newsImage = $banner->image && file_exists(storage_path('app/public/' . $banner->image))
-                                            ? asset('storage/' . $banner->image)
+                                        $newsImage = $banner->image && file_exists(public_path($banner->image))
+                                            ? asset($banner->image)
                                             : asset('/placeholder.jpg');
                                     @endphp
                                     <img src="{{ $newsImage }}" class="card-img-top"

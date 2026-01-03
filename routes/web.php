@@ -26,6 +26,7 @@ Route::post('/order', [App\Http\Controllers\TopUpController::class, 'order']);
 
 Route::get('/game/{id}', [GameDetailController::class, 'show'])->name('game.detail');
 Route::post('/promo/verify', [GameDetailController::class, 'verifyPromo'])->name('promo.verify');
+Route::post('/game/send-to-apigames', [App\Http\Controllers\GameTransactionController::class, 'sendToAPIGames'])->name('game.send-to-apigames');
 
 // Transaction Routes (accessible by both authenticated users and guests)
 Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');

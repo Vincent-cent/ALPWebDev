@@ -177,7 +177,8 @@ class GameDetail {
         .then(response => {
             if (!response.ok) {
                 return response.json().then(data => {
-                    throw new Error(data.message || 'Transaction creation failed');
+                    console.error('Transaction creation error:', data);
+                    throw new Error(data.message || data.errors ? JSON.stringify(data.errors) : 'Transaction creation failed');
                 });
             }
             return response.json();
@@ -185,9 +186,8 @@ class GameDetail {
         .then(transaksiData => {
             console.log('Transaction created:', transaksiData);
             
-            // Extract product ID from selected item
-            const selectedItem = form.querySelector('input[name="item_id"]:checked');
-            const itemId = selectedItem ? selectedItem.value : null;
+            // Get the selected item database ID
+            const selectedItemId = formData.get('item_id');
             
             // Now send to APIGames
             return fetch('/game/send-to-apigames', {
@@ -201,14 +201,15 @@ class GameDetail {
                     transaksi_id: transaksiData.transaksi_id || transaksiData.id,
                     user_id: formData.get('user_id'),
                     server_id: formData.get('server_id'),
-                    product_id: formData.get('item_id'), // Using item_id as product_id
+                    item_db_id: selectedItemId, // Database ID to fetch the product code
                 })
             });
         })
         .then(response => {
             if (!response.ok) {
                 return response.json().then(data => {
-                    throw new Error(data.message || 'APIGames request failed');
+                    console.error('APIGames request error:', data);
+                    throw new Error(data.message || data.errors ? JSON.stringify(data.errors) : 'APIGames request failed');
                 });
             }
             return response.json();
