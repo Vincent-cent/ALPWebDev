@@ -33,7 +33,7 @@ class GameController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('games', 'public');
+            $validated['image'] = 'storage/' . $request->file('image')->store('games', 'public');
         }
 
         Game::create($validated);
@@ -62,9 +62,10 @@ class GameController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($game->image) {
-                Storage::disk('public')->delete($game->image);
+                $storagePath = str_replace('storage/', '', $game->image);
+                Storage::disk('public')->delete($storagePath);
             }
-            $validated['image'] = $request->file('image')->store('games', 'public');
+            $validated['image'] = 'storage/' . $request->file('image')->store('games', 'public');
         }
 
         $game->update($validated);

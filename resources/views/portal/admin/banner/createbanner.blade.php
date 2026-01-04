@@ -1,7 +1,7 @@
 @extends('layouts.admin_mainLayout')
 
 @section('content')
-<div class="container py-5">
+<div class="container py-5" style="margin-left: 250px;">
     <div class="row mb-4">
         <div class="col-md-6">
             <h1>Tambah Banner</h1>
@@ -12,7 +12,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('admin.banners.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.banner-promos.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="mb-3">

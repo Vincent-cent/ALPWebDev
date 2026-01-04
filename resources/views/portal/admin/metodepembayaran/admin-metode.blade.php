@@ -41,7 +41,7 @@
                                 <tr>
                                     <td>
                                         @if($metode->logo)
-                                            <img src="{{ asset('storage/payment-methods/' . $metode->logo) }}" 
+                                            <img src="{{ asset($metode->logo) }}" 
                                                  alt="{{ $metode->name }}" 
                                                  style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;">
                                         @else

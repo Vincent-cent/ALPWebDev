@@ -19,7 +19,7 @@ class BannerPromoController extends Controller
     public function create()
     {
         $games = Game::all();
-        return view('portal.admin.banner.admin-add-banner', compact('games'));
+        return view('portal.admin.banner.createbanner', compact('games'));
     }
 
     public function store(Request $request)
@@ -37,7 +37,7 @@ class BannerPromoController extends Controller
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('banners', 'public');
-            $data['image'] = $imagePath;
+            $data['image'] = 'storage/' . $imagePath;
         }
 
         BannerPromo::create($data);
@@ -55,7 +55,7 @@ class BannerPromoController extends Controller
     public function edit(BannerPromo $bannerPromo)
     {
         $games = Game::all();
-        return view('portal.admin.banner.admin-update-banner', compact('bannerPromo', 'games'));
+        return view('portal.admin.banner.updatebanner', ['banner' => $bannerPromo, 'games' => $games]);
     }
 
     public function update(Request $request, BannerPromo $bannerPromo)
@@ -74,11 +74,13 @@ class BannerPromoController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if it exists
             if ($bannerPromo->image) {
-                Storage::disk('public')->delete($bannerPromo->image);
+                // Remove storage/ prefix for deletion
+                $storagePath = str_replace('storage/', '', $bannerPromo->image);
+                Storage::disk('public')->delete($storagePath);
             }
             
             $imagePath = $request->file('image')->store('banners', 'public');
-            $data['image'] = $imagePath;
+            $data['image'] = 'storage/' . $imagePath;
         }
 
         $bannerPromo->update($data);

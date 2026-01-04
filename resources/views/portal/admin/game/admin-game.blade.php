@@ -123,7 +123,7 @@
                                             </td>
                                             <td>
                                                 @if($game->image)
-                                                    <img src="{{ asset('storage/' . $game->image) }}" 
+                                                    <img src="{{ asset($game->image) }}" 
                                                          alt="{{ $game->name }}" 
                                                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                                                 @else

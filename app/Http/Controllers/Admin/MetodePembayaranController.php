@@ -59,7 +59,7 @@ class MetodePembayaranController extends Controller
             'name' => $validated['name'],
             'fee' => $validated['fee'],
             'type' => $validated['type'],
-            'logo' => $logoFileName,
+            'logo' => $logoFileName ? 'storage/payment-methods/' . $logoFileName : null,
             'is_active' => $request->has('is_active')
         ]);
 
@@ -123,7 +123,7 @@ class MetodePembayaranController extends Controller
             'name' => $validated['name'],
             'fee' => $validated['fee'],
             'type' => $validated['type'],
-            'logo' => $logoFileName,
+            'logo' => $logoFileName ? ('storage/payment-methods/' . (strpos($logoFileName, 'storage/') === 0 ? str_replace('storage/payment-methods/', '', $logoFileName) : $logoFileName)) : null,
             'is_active' => $request->has('is_active')
         ]);
 
