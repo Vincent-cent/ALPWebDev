@@ -19,7 +19,7 @@ class PromoNotifikasiController extends Controller
     public function create()
     {
         $promoCodes = PromoCode::all();
-        return view('portal.admin.promo-notifikasis.create', compact('promoCodes'));
+        return view('portal.admin.notifikasi.admin-add-notifikasi', compact('promoCodes'));
     }
 
     public function store(Request $request)
@@ -40,20 +40,20 @@ class PromoNotifikasiController extends Controller
 
         PromoNotifikasi::create($data);
 
-        return redirect()->route('admin.promo-notifikasis.index')
+        return redirect()->route('admin.promo-notifikasi.index')
                         ->with('success', 'Promo notification created successfully.');
     }
 
     public function show(PromoNotifikasi $promoNotifikasi)
     {
-        $promoNotifikasi->load('promoCode');
-        return view('portal.admin.promo-notifikasis.show', compact('promoNotifikasi'));
+        return redirect()->route('admin.promo-notifikasi.index');
     }
 
     public function edit(PromoNotifikasi $promoNotifikasi)
     {
         $promoCodes = PromoCode::all();
-        return view('portal.admin.promo-notifikasis.edit', compact('promoNotifikasi', 'promoCodes'));
+        $notification = $promoNotifikasi; // Alias for view compatibility
+        return view('portal.admin.notifikasi.admin-update-notifikasi', compact('notification', 'promoCodes'));
     }
 
     public function update(Request $request, PromoNotifikasi $promoNotifikasi)
@@ -79,7 +79,7 @@ class PromoNotifikasiController extends Controller
 
         $promoNotifikasi->update($data);
 
-        return redirect()->route('admin.promo-notifikasis.index')
+        return redirect()->route('admin.promo-notifikasi.index')
                         ->with('success', 'Promo notification updated successfully.');
     }
 
@@ -92,7 +92,7 @@ class PromoNotifikasiController extends Controller
         
         $promoNotifikasi->delete();
         
-        return redirect()->route('admin.promo-notifikasis.index')
+        return redirect()->route('admin.promo-notifikasi.index')
                         ->with('success', 'Promo notification deleted successfully.');
     }
 }

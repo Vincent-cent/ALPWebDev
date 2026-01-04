@@ -31,6 +31,30 @@ class LacakPesananController extends Controller
                            ->with('error', 'Invoice id tidak valid.');
         }
 
+        // For guest users, only allow them to access guest transactions (user_id is null)
+        // and add the transaction to their session so they can view it
+        if (!auth()->check()) {
+            // Only allow guests to view transactions that were created by guests
+            if ($transaksi->user_id !== null) {
+                return redirect()->back()
+                               ->withInput()
+                               ->with('error', 'You are not authorized to view this transaction. Please log in if this is your account.');
+            }
+            
+            $guestTransactions = session('guest_transactions', []);
+            if (!in_array($transaksi->id, $guestTransactions)) {
+                $guestTransactions[] = $transaksi->id;
+                session(['guest_transactions' => $guestTransactions]);
+            }
+        } else {
+            // For authenticated users, check if the transaction belongs to them
+            if ($transaksi->user_id && $transaksi->user_id !== auth()->id()) {
+                return redirect()->back()
+                               ->withInput()
+                               ->with('error', 'You are not authorized to view this transaction.');
+            }
+        }
+
         // Redirect to transaction page
         return redirect()->route('transaksi.show', $transaksi->id);
     }

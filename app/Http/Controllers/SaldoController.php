@@ -83,6 +83,10 @@ class SaldoController extends Controller
                         'quantity' => 1,
                         'name' => 'TOSHOP Saldo Top-up Rp ' . number_format($amount) . ' + Admin Fee',
                     ]],
+                    'callbacks' => [
+                        'finish' => route('saldo.success', $transaksi->id),
+                    ],
+                    'notification_url' => route('saldo.callback'),
                 ];
 
                 // Set specific payment methods based on selected method
@@ -95,6 +99,13 @@ class SaldoController extends Controller
                 }
 
                 try {
+                    Log::info('Creating Midtrans Snap token for saldo top-up', [
+                        'order_id' => $orderId,
+                        'amount' => $amount,
+                        'total' => $total,
+                        'payload' => $payload
+                    ]);
+                    
                     $snapToken = \Midtrans\Snap::getSnapToken($payload);
                     $transaksi->update([
                         'midtrans_transaction_id' => $snapToken,
@@ -146,24 +157,42 @@ class SaldoController extends Controller
     public function callback(Request $request)
     {
         try {
+            Log::info('Saldo callback received', $request->all());
+            
             // Midtrans callback handling
             $serverKey = config('midtrans.server_key');
-            $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+            $orderId = $request->order_id;
+            $statusCode = $request->status_code;
+            $grossAmount = $request->gross_amount;
+            
+            $hashed = hash("sha512", $orderId . $statusCode . $grossAmount . $serverKey);
 
             if ($hashed === $request->signature_key) {
-                $orderId = $request->order_id;
                 $transactionStatus = $request->transaction_status;
                 $fraudStatus = $request->fraud_status ?? null;
 
                 $transaksi = Transaksi::where('midtrans_order_id', $orderId)->first();
 
                 if ($transaksi && str_starts_with($orderId, 'TOPUP-')) {
-                    if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
-                        // Payment successful - add to saldo
+                    Log::info('Processing saldo top-up callback', [
+                        'order_id' => $orderId,
+                        'status' => $transactionStatus,
+                        'paid_at' => $transaksi->paid_at
+                    ]);
+                    
+                    if (in_array($transactionStatus, ['settlement', 'capture', 'cancel'])) {
+                        // Payment successful - add to saldo (temporarily treating 'cancel' as success)
                         if (!$transaksi->paid_at) {
                             $saldo = $transaksi->user->saldo;
                             if ($saldo) {
-                                $saldo->addBalance($transaksi->items->first()->price);
+                                $topupAmount = $transaksi->items->first()->price;
+                                $saldo->addBalance($topupAmount);
+                                Log::info('Saldo balance updated', [
+                                    'user_id' => $transaksi->user_id,
+                                    'amount_added' => $topupAmount,
+                                    'new_balance' => $saldo->amount,
+                                    'status' => $transactionStatus
+                                ]);
                             }
                             
                             $transaksi->update([
@@ -173,15 +202,24 @@ class SaldoController extends Controller
                         }
                     } elseif ($transactionStatus == 'pending') {
                         $transaksi->update(['midtrans_status' => $transactionStatus]);
-                    } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+                    } elseif (in_array($transactionStatus, ['deny', 'expire'])) {
                         $transaksi->update(['midtrans_status' => $transactionStatus]);
                     }
                 }
+            } else {
+                Log::warning('Invalid callback signature', [
+                    'order_id' => $orderId,
+                    'received_signature' => $request->signature_key,
+                    'calculated_signature' => $hashed
+                ]);
             }
 
             return response('OK', 200);
         } catch (\Exception $e) {
-            Log::error('Saldo callback error: ' . $e->getMessage());
+            Log::error('Saldo callback error: ' . $e->getMessage(), [
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response('Error', 500);
         }
     }

@@ -24,10 +24,8 @@
         @yield('content')
     </main>
 
-    @include('layouts.components._footer') --}}
+    {{-- @include('layouts.components._footer') --}}
     
-
-    
-    
+    @yield('scripts')
 </body>
 </html>

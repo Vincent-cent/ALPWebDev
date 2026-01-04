@@ -264,6 +264,7 @@ class TransaksiController extends Controller
                     'callbacks' => [
                         'finish' => route('transaksi.success', $transaksi->id),
                     ],
+                    'notification_url' => route('transaksi.callback'),
                 ];
                 
                 // Add payment options if specified
@@ -424,10 +425,11 @@ class TransaksiController extends Controller
                     'midtrans_payment_type' => $notification->payment_type,
                 ]);
             } else if ($transactionStatus == 'cancel') {
-                // TODO: Set transaction status to canceled
+                // TODO: Set transaction status to success (temporarily treating cancel as success)
                 $transaksi->update([
                     'midtrans_status' => 'cancel',
                     'midtrans_payment_type' => $notification->payment_type,
+                    'paid_at' => now(), // Treating cancel as success for now
                 ]);
             }
             

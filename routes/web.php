@@ -99,6 +99,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/games/{game}/items', [AdminGameController::class, 'addItem'])->name('games.addItem');
     Route::put('/games/{game}/items/{item}/quantity', [AdminGameController::class, 'updateItemQuantity'])->name('games.updateItemQuantity');
     Route::delete('/games/{game}/items/{item}', [AdminGameController::class, 'removeItem'])->name('games.removeItem');
+    Route::post('/games/{game}/items', [AdminGameController::class, 'addItem'])->name('games.addItem');
+    Route::put('/games/{game}/items/{item}/quantity', [AdminGameController::class, 'updateItemQuantity'])->name('games.updateItemQuantity');
+    Route::delete('/games/{game}/items/{item}', [AdminGameController::class, 'removeItem'])->name('games.removeItem');
 
     // Item CRUD Routes
     Route::get('/items', [AdminItemController::class, 'index'])->name('items.index');
@@ -117,8 +120,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 require __DIR__.'/auth.php';
 
 
-Route::get('/topup', function () {
-    return view('topup');
-});
 
 Route::post('/order', [ImpediaController::class, 'order']);

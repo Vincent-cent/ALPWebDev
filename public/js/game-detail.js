@@ -139,6 +139,9 @@ class GameDetail {
                 }
             } else {
                 console.log(`Field ${fieldName}: ${field.value}`);
+                if (field.classList.contains('is-invalid')) {
+                    field.classList.remove('is-invalid');
+                }
             }
         });
 
@@ -149,11 +152,8 @@ class GameDetail {
             return false;
         }
 
-        console.log('Form validation passed, submitting via AJAX...');
+        console.log('Form validation passed, submitting normally...');
         
-        // Prevent default form submission
-        e.preventDefault();
-
         // Show loading state
         const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) {
@@ -161,83 +161,9 @@ class GameDetail {
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
         }
 
-        // Get form data
-        const formData = new FormData(form);
-        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-        // First, submit to create transaction
-        fetch(form.action, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': token,
-                'Accept': 'application/json',
-            },
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    console.error('Transaction creation error:', data);
-                    throw new Error(data.message || data.errors ? JSON.stringify(data.errors) : 'Transaction creation failed');
-                });
-            }
-            return response.json();
-        })
-        .then(transaksiData => {
-            console.log('Transaction created:', transaksiData);
-            
-            // Get the selected item database ID
-            const selectedItemId = formData.get('item_id');
-            
-            // Now send to APIGames
-            return fetch('/game/send-to-apigames', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token,
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    transaksi_id: transaksiData.transaksi_id || transaksiData.id,
-                    user_id: formData.get('user_id'),
-                    server_id: formData.get('server_id'),
-                    item_db_id: selectedItemId, // Database ID to fetch the product code
-                })
-            });
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    console.error('APIGames request error:', data);
-                    throw new Error(data.message || data.errors ? JSON.stringify(data.errors) : 'APIGames request failed');
-                });
-            }
-            return response.json();
-        })
-        .then(apiResult => {
-            console.log('APIGames response:', apiResult);
-            
-            // Redirect to transaction success page or display result
-            if (apiResult.success) {
-                window.location.href = `/transaksi/${apiResult.transaksi_id}/success`;
-            } else {
-                alert('Terjadi kesalahan saat mengirim ke APIGames: ' + apiResult.message);
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '🛒 <strong>Beli Sekarang</strong>';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan: ' + error.message);
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '🛒 <strong>Beli Sekarang</strong>';
-            }
-        });
-
-        return false;
+        // Allow normal form submission - don't prevent default
+        // The TransaksiController will handle the redirect to payment page
+        return true;
     }
 }
 

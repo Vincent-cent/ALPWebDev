@@ -147,5 +147,5 @@
 @endsection
 
 @section('scripts')
-    @vite('resources/js/admin/promocode-form.js')
+@vite('resources/js/admin/promocode-form.js')
 @endsection

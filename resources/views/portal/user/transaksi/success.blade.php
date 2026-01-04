@@ -66,6 +66,9 @@
                                 <i class="fas fa-history me-2"></i>View History
                             </a>
                         @else
+                            <a href="{{ route('lacak-pesanan') }}" class="btn btn-outline-info btn-lg px-4">
+                                <i class="fas fa-search me-2"></i>Track Orders
+                            </a>
                             <a href="{{ route('login') }}" class="btn btn-outline-success btn-lg px-4">
                                 <i class="fas fa-user me-2"></i>Login to Track Orders
                             </a>
@@ -81,7 +84,7 @@
                         @else
                             <small class="text-muted">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Your purchase will be processed within 5-10 minutes. Please save this Order ID ({{ $transaksi->midtrans_order_id }}) for your records.
+                                Your purchase will be processed within 5-10 minutes. Please save this Order ID ({{ $transaksi->midtrans_order_id }}) for your records. You can use this ID to track your order anytime.
                             </small>
                         @endauth
                     </div>

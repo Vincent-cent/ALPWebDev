@@ -17,43 +17,14 @@
     @vite(['resources/css/app.css', 'resources/css/admin.css', 'resources/js/app.js'])
     
     @yield('head')
-    @stack('styles')
 </head>
 <body>
-    <!-- Admin Sidebar -->
-    @include('_admin_navigation')
+        <!-- Admin Sidebar -->
+        @include('_admin_navigation')
     
-    <!-- Main Content -->
-    <div class="admin-main-content">
-        <!-- Admin Header -->
-        <div class="admin-header">
-            <h1 class="admin-page-title">@yield('page-title')</h1>
-            <div class="d-flex align-items-center">
-                <span class="me-3">Hello, {{ auth()->user()->nama }}!</span>
-                <a href="{{ route('logout') }}" class="btn btn-outline-danger btn-sm">
-                    <i class="fas fa-sign-out-alt me-1"></i>
-                    Logout
-                </a>
-            </div>
-        </div>
-        
-        <!-- Flash Messages -->
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-        
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-        
         <!-- Page Content -->
         @yield('content')
+
     </div>
     
     @yield('scripts')
