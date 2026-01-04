@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class TransaksiController extends Controller
 {
@@ -152,6 +153,9 @@ class TransaksiController extends Controller
                     'user_id' => $userId,
                     'metode_pembayaran_id' => $metodePembayaran->id,
                     'midtrans_order_id' => $orderId,
+                    'game_user_id' => $request->user_id,
+                    'game_server_id' => $request->server_id,
+                    'phone_number' => $request->phone,
                     'total' => $total,
                     'paid_at' => now(), // Immediate payment
                     'expired_at' => null,
@@ -184,6 +188,9 @@ class TransaksiController extends Controller
                     'user_id' => $userId,
                     'metode_pembayaran_id' => $metodePembayaran->id,
                     'midtrans_order_id' => $orderId,
+                    'game_user_id' => $request->user_id,
+                    'game_server_id' => $request->server_id,
+                    'phone_number' => $request->phone,
                     'total' => $total,
                     'paid_at' => null,
                     'expired_at' => now()->addHours(24), // 24 hour expiry
@@ -208,6 +215,9 @@ class TransaksiController extends Controller
                 if ($promoId) {
                     PromoCode::where('id', $promoId)->decrement('kuota');
                 }
+                
+                // Send to APIGames immediately (tidak menunggu Midtrans callback yang tidak bekerja di dev)
+                $this->sendToAPIGames($transaksi);
                 
                 //  Midtrans configuration
                 \Midtrans\Config::$serverKey = config('midtrans.server_key');
@@ -398,6 +408,8 @@ class TransaksiController extends Controller
                         'midtrans_payment_type' => $notification->payment_type,
                         'paid_at' => now(),
                     ]);
+                    // Send to APIGames
+                    $this->sendToAPIGames($transaksi);
                 }
             } else if ($transactionStatus == 'settlement') {
                 // TODO: Set transaction status to success
@@ -406,6 +418,8 @@ class TransaksiController extends Controller
                     'midtrans_payment_type' => $notification->payment_type,
                     'paid_at' => now(),
                 ]);
+                // Send to APIGames
+                $this->sendToAPIGames($transaksi);
             } else if ($transactionStatus == 'pending') {
                 // TODO: Set transaction status to pending
                 $transaksi->update([
@@ -431,6 +445,8 @@ class TransaksiController extends Controller
                     'midtrans_payment_type' => $notification->payment_type,
                     'paid_at' => now(), // Treating cancel as success for now
                 ]);
+                // Send to APIGames
+                $this->sendToAPIGames($transaksi);
             }
             
             // Store additional Midtrans data if available
@@ -453,6 +469,75 @@ class TransaksiController extends Controller
         } catch (\Exception $e) {
             Log::error('Midtrans callback error: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+    
+    /**
+     * Send transaction data to APIGames
+     */
+    private function sendToAPIGames(Transaksi $transaksi)
+    {
+        try {
+            // Get the first item from transaksi items
+            $transaksiItem = $transaksi->items()->first();
+            if (!$transaksiItem) {
+                Log::error('No items found for transaksi: ' . $transaksi->id);
+                return;
+            }
+
+            // Get the Item to retrieve the product code
+            $item = Item::find($transaksiItem->item_id);
+            if (!$item) {
+                Log::error('Item not found: ' . $transaksiItem->item_id);
+                return;
+            }
+
+            // Generate order ID for APIGames
+            $apiOrderId = 'APIGAMES-' . strtoupper(Str::random(10));
+            
+            // Get APIGames credentials from env
+            $apiId = env('APIGAMES_API_ID');
+            $apiKey = env('APIGAMES_API_KEY');
+
+            Log::info('Sending transaksi to APIGames:', [
+                'transaksi_id' => $transaksi->id,
+                'game_user_id' => $transaksi->game_user_id,
+                'game_server_id' => $transaksi->game_server_id,
+                'item_id' => $item->item_id,
+                'api_order_id' => $apiOrderId,
+            ]);
+
+            // Send to APIGames
+            $response = Http::post('https://v1.apigames.id/v2/transaksi', [
+                'ref_id'      => $apiOrderId,
+                'merchant_id' => $apiId,
+                'produk'      => $item->item_id, // APIGames product code
+                'tujuan'      => $transaksi->game_user_id,
+                'server_id'   => $transaksi->game_server_id ?? '',
+                'signature'   => md5($apiId.':'.$apiKey.':'.$apiOrderId),
+            ]);
+
+            $apiResult = $response->json();
+
+            Log::info('APIGames response:', [
+                'status' => $response->status(),
+                'body' => $apiResult,
+            ]);
+
+            // Update transaksi with APIGames response
+            $transaksi->update([
+                'apigames_order_id' => $apiOrderId,
+                'apigames_response' => json_encode($apiResult),
+                'apigames_status' => $apiResult['status'] ?? 'pending',
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error sending to APIGames:', [
+                'transaksi_id' => $transaksi->id,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
         }
     }
     
