@@ -19,7 +19,6 @@ return new class extends Migration
             $table->decimal('harga', 12, 2);
             $table->decimal('harga_coret', 12, 2)->nullable();
             $table->integer('discount_percent')->default(0);
-            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

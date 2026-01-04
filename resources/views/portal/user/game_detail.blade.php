@@ -120,7 +120,7 @@
                                         @php $tipeItem = $groupedItems->first()->tipeItem; @endphp
                                         <li class="nav-item me-2" role="presentation">
                                             <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="tab-{{ $tipeId }}" data-bs-toggle="pill" data-bs-target="#content-{{ $tipeId }}" type="button" style="border-radius: 8px; padding: 6px 16px; font-size: 14px;">
-                                                {{ $tipeItem->icon }} {{ $tipeItem->name }}
+                                                {{ $tipeItem->name }}
                                             </button>
                                         </li>
                                     @endforeach
@@ -136,11 +136,11 @@
                                                         <label class="btn btn-outline-primary w-100 text-start p-3 h-100" for="item-{{ $item->id }}" style="background-color: #e1e3e8; border: 2px solid #e1e3e8; border-radius: 12px;">
                                                             <div class="d-flex flex-column align-items-center text-center">
                                                                 @php
-                                                                    $itemImage = $item->image && file_exists(public_path($item->image))
-                                                                        ? asset($item->image)
+                                                                    $itemImage = $item->tipeItem && $item->tipeItem->image
+                                                                        ? asset($item->tipeItem->image)
                                                                         : asset('images/placeholder.png');
                                                                 @endphp
-                                                                <div class="rounded mb-2 d-flex align-items-center justify-content-center" style="background-color: #2d2d44; width: 100%; height: 70px; overflow: hidden;">
+                                                                <div class="rounded mb-2 d-flex align-items-center justify-content-center" style="background-color: #2d2d44; width: 100%; height: 120px; overflow: hidden;">
                                                                     <img src="{{ $itemImage }}" alt="{{ $item->nama }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                                                 </div>
                                                                 <h6 class="mb-1 text-dark fw-bold" style="font-size: 14px;">{{ $item->nama }}</h6>
@@ -200,7 +200,7 @@
                                                         ? asset($metode->logo)
                                                         : asset('images/placeholder.png');
                                                 @endphp
-                                                <img src="{{ $paymentLogo }}" alt="{{ $metode->name }}" class="mb-2" style="height: 35px; object-fit: contain;">
+                                                <img src="{{ $paymentLogo }}" alt="{{ $metode->name }}" class="mb-2" style="height: 60px; object-fit: contain;">
                                                 <h6 class="mb-1 text-dark fw-bold" style="font-size: 14px;">{{ $metode->name }}</h6>
                                                 <small class="text-muted" style="font-size: 12px;">Biaya Admin: Rp {{ number_format($metode->fee, 0, ',', '.') }}</small>
                                                 <p class="fw-bold mb-0 mt-2" style="color: #3b82f6; font-size: 14px;">Total Harga: <span class="total-price">Rp. 0</span></p>

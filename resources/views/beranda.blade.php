@@ -125,7 +125,9 @@
                                         style="background: #2a3150; border-radius: 15px;">
                                         <div class="card-body p-3 text-center">
                                             @php
-                                                $voucherImage = $voucher->image && file_exists(public_path($voucher->image))
+
+                                            
+                                            $voucherImage = $voucher->image && file_exists(public_path($voucher->image))
                                                     ? asset($voucher->image)
                                                     : asset('/placeholder.jpg');
                                             @endphp

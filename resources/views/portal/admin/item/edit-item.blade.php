@@ -81,27 +81,6 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Gambar</label>
-                            @if($item->image)
-                                <div class="mb-2">
-                                    <p class="text-muted">Gambar saat ini:</p>
-                                    <img src="{{ asset($item->image) }}" alt="{{ $item->nama }}" 
-                                         style="max-width: 300px; max-height: 200px; object-fit: cover;">
-                                </div>
-                            @endif
-                            <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                                   id="image" name="image" accept="image/*">
-                            <small class="text-muted">Format: JPG, PNG, GIF (Max: 2MB). Kosongkan jika tidak ingin mengubah gambar.</small>
-                            @error('image')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div id="imagePreview" class="mt-2" style="display:none;">
-                                <p class="text-muted">Pratinjau gambar baru:</p>
-                                <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 200px;">
-                            </div>
-                        </div>
-
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-circle"></i> Perbarui

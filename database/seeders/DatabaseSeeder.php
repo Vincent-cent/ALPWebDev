@@ -47,14 +47,33 @@ class TipeItemSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            ['name' => 'Diamond',],
-            ['name' => 'Voucher'],
-            ['name' => 'BattlePass'],
-            ['name' => 'Membership'],
+            [
+                'name' => 'Diamond',
+                'description' => 'Mata uang premium untuk membeli item eksklusif',
+                'image' => 'games/diamond.png',
+            ],
+            [
+                'name' => 'Voucher',
+                'description' => 'Kode voucher untuk berbagai layanan dan game',
+                'image' => 'games/voucher.png',
+            ],
+            [
+                'name' => 'BattlePass',
+                'description' => 'Pass permainan untuk membuka konten eksklusif',
+                'image' => 'games/battlepass.png',
+            ],
+            [
+                'name' => 'Membership',
+                'description' => 'Keanggotaan premium untuk bonus dan keuntungan',
+                'image' => 'games/membership.png',
+            ],
         ];
 
         foreach ($types as $type) {
-            TipeItem::firstOrCreate($type);
+            TipeItem::firstOrCreate(
+                ['name' => $type['name']],
+                $type
+            );
         }
     }
 }
@@ -81,7 +100,6 @@ class ItemSeeder extends Seeder
             foreach ($mlItems as $item) {
                 $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $diamond->id,
-                    'image' => 'games/diamond.png',
                 ]));
                 $mobileLegends->items()->attach($createdItem->id, ['quantity' => 1]);
             }
@@ -96,7 +114,6 @@ class ItemSeeder extends Seeder
             foreach ($ffItems as $item) {
                 $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $diamond->id,
-                    'image' => 'games/diamond.png',
                 ]));
                 $freeFire->items()->attach($createdItem->id, ['quantity' => 1]);
             }
@@ -111,7 +128,6 @@ class ItemSeeder extends Seeder
             foreach ($steamItems as $item) {
                 $createdItem = Item::create(array_merge($item, [
                     'tipe_item_id' => $voucher->id,
-                    'image' => 'games/voucher.png',
                 ]));
                 $steam->items()->attach($createdItem->id, ['quantity' => 1]);
             }
@@ -161,21 +177,21 @@ class BannerPromoSeeder extends Seeder
         $banners = [
             [
                 'name' => 'Mobile Legends Promo',
-                'image' => 'banners/ml-banner.jpg',
+                'image' => 'banner/BannerMobileLegends.png',
                 'is_active' => true,
                 'order' => 1,
                 'game_id' => $mlGame?->id,
             ],
             [
                 'name' => 'Free Fire Sale',
-                'image' => 'banners/ff-banner.jpg',
+                'image' => 'banner/BannerFreeFire.jpg',
                 'is_active' => true,
                 'order' => 2,
                 'game_id' => $ffGame?->id,
             ],
             [
                 'name' => 'Steam Wallet Discount',
-                'image' => 'banners/steam-banner.jpg',
+                'image' => 'banner/BannerSteam.jpg',
                 'is_active' => true,
                 'order' => 3,
                 'game_id' => $steamGame?->id,
@@ -198,70 +214,70 @@ class MetodePembayaranSeeder extends Seeder
                 'name' => 'BCA Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/bca.png',
+                'logo' => 'MetodePembayaran/BCA.png',
                 'is_active' => true,
             ],
             [
                 'name' => 'BRI Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer', 
-                'logo' => 'payments/bri.png',
+                'logo' => 'MetodePembayaran/BRI.png',
                 'is_active' => true,
             ],
             [
                 'name' => 'BNI Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/bni.png',
+                'logo' => 'MetodePembayaran/BNI.png',
                 'is_active' => true,
             ],
             [
                 'name' => 'Mandiri Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/mandiri.png',
+                'logo' => 'MetodePembayaran/Mandiri.png',
                 'is_active' => true,
             ],
             [
                 'name' => 'Permata Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/permata.png',
+                'logo' => 'MetodePembayaran/Permata.png',
                 'is_active' => true,
             ],
             [
                 'name' => 'BNC Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/bnc.png',
+                'logo' => 'MetodePembayaran/BNC.jpg',
                 'is_active' => true,
             ],
             [
                 'name' => 'Danamon Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/danamon.png',
+                'logo' => 'MetodePembayaran/Danamon.png',
                 'is_active' => true,
             ],
             [
                 'name' => 'CIMB Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/cimb.png',
+                'logo' => 'MetodePembayaran/CIMB.png',
                 'is_active' => true,
             ],
             [
                 'name' => 'BSI Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/bsi.png',
+                'logo' => 'MetodePembayaran/BSI.png',
                 'is_active' => true,
             ],
             [
                 'name' => 'BTN Virtual Account',
                 'fee' => 4500,
                 'type' => 'bank_transfer',
-                'logo' => 'payments/btn.png',
+                'logo' => 'MetodePembayaran/BTN.png',
                 'is_active' => true,
             ],
             // QRIS
@@ -269,7 +285,7 @@ class MetodePembayaranSeeder extends Seeder
                 'name' => 'QRIS',
                 'fee' => 750, // 0.7% fee
                 'type' => 'qris',
-                'logo' => 'payments/qris.png',
+                'logo' => 'MetodePembayaran/QRIS.png',
                 'is_active' => true,
             ],
             // User Saldo
@@ -277,7 +293,7 @@ class MetodePembayaranSeeder extends Seeder
                 'name' => 'Saldo TOSHOP',
                 'fee' => 0,
                 'type' => 'saldo',
-                'logo' => 'payments/saldo.png',
+                'logo' => 'MetodePembayaran/TOSHOP.png',
                 'is_active' => true,
             ],
         ];

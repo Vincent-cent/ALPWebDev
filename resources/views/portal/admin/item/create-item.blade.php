@@ -79,19 +79,6 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Gambar <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                                   id="image" name="image" accept="image/*" required>
-                            <small class="text-muted">Format: JPG, PNG, GIF (Max: 2MB)</small>
-                            @error('image')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div id="imagePreview" class="mt-2" style="display:none;">
-                                <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 150px;">
-                            </div>
-                        </div>
-
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-circle"></i> Simpan

@@ -9,6 +9,7 @@ class TipeItem extends Model
     protected $fillable = [
         'name',
         'description',
+        'image'
     ];
 
     public function items()

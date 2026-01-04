@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\Game;
 use App\Models\TipeItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
@@ -29,7 +30,6 @@ class ItemController extends Controller
             'nama' => 'required|string|max:255',
             'item_id' => 'nullable|string|max:50',
             'game_id' => 'required|exists:games,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'harga' => 'required|numeric|min:0',
             'tipe_item_id' => 'nullable|exists:tipe_items,id',
         ]);
@@ -63,16 +63,7 @@ class ItemController extends Controller
             'harga_coret' => 'nullable|numeric|min:0',
             'discount_percent' => 'nullable|integer|min:0|max:100',
             'tipe' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            if ($item->image) {
-                \Storage::disk('public')->delete($item->image);
-            }
-            $validated['image'] = $request->file('image')->store('items', 'public');
-        }
 
         $item->update($validated);
         return redirect()->route('admin.games.index')->with('success', 'Item berhasil diupdate');
@@ -80,10 +71,6 @@ class ItemController extends Controller
 
     public function destroy(Item $item)
     {
-        // Delete image if exists
-        if ($item->image && file_exists(public_path($item->image))) {
-            unlink(public_path($item->image));
-        }
 
         $item->delete();
 

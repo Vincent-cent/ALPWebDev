@@ -15,7 +15,6 @@ class Item extends Model
         'harga',
         'harga_coret',
         'discount_percent',
-        'image',
     ];
 
     public function game()

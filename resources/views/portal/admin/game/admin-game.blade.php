@@ -30,6 +30,7 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
+                                            <th>Image</th>
                                             <th>Name</th>
                                             <th>Description</th>
                                             <th>Created</th>
@@ -39,12 +40,27 @@
                                     <tbody>
                                         @forelse($tipeItems ?? [] as $tipeItem)
                                         <tr>
+                                            <td>
+                                                @if($tipeItem->image)
+                                                    <img src="{{ asset($tipeItem->image) }}" 
+                                                         alt="{{ $tipeItem->name }}" 
+                                                         style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px;">
+                                                @else
+                                                    <div class="bg-light d-flex align-items-center justify-content-center" 
+                                                         style="width: 50px; height: 50px; border-radius: 4px;">
+                                                        <i class="fas fa-image text-muted"></i>
+                                                    </div>
+                                                @endif
+                                            </td>
                                             <td><strong>{{ $tipeItem->name }}</strong></td>
                                             <td>{{ Str::limit($tipeItem->description ?? '', 50) }}</td>
                                             <td>{{ $tipeItem->created_at ? $tipeItem->created_at->format('d M Y') : 'N/A' }}</td>
                                             <td>
-                                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editTipeItemModal" 
-                                                        onclick="editTipeItem({{ $tipeItem->id }}, '{{ addslashes($tipeItem->name) }}', '{{ addslashes($tipeItem->description ?? '') }}')">
+                                                <button class="btn btn-sm btn-warning edit-tipe-btn" data-bs-toggle="modal" data-bs-target="#editTipeItemModal" 
+                                                        data-id="{{ $tipeItem->id }}"
+                                                        data-name="{{ $tipeItem->name }}"
+                                                        data-description="{{ $tipeItem->description }}"
+                                                        data-image="{{ $tipeItem->image }}">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <form action="{{ route('admin.tipe-items.destroy', $tipeItem) }}" method="POST" class="d-inline">
@@ -58,7 +74,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="4" class="text-center">No item types found</td>
+                                            <td colspan="5" class="text-center">No item types found</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
@@ -178,7 +194,7 @@
                                                                     <td>Rp {{ number_format($item->harga) }}</td>
                                                                     <td>
                                                                         <button class="btn btn-xs btn-warning btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#editItemModal"
-                                                                                onclick="prepareEditItemModal({{ $game->id }}, {{ $item->id }}, '{{ addslashes($item->nama) }}', '{{ addslashes($item->item_id ?? '') }}', {{ $item->tipe_item_id }}, {{ $item->harga }}, {{ $item->harga_coret ?? 0 }}, {{ $item->discount_percent ?? 0 }}, '{{ $item->image ?? '' }}')">
+                                                                                onclick="prepareEditItemModal({{ $game->id }}, {{ $item->id }}, '{{ addslashes($item->nama) }}', '{{ addslashes($item->item_id ?? '') }}', {{ $item->tipe_item_id }}, {{ $item->harga }}, {{ $item->harga_coret ?? 0 }}, {{ $item->discount_percent ?? 0 }})">
                                                                             <i class="fas fa-edit"></i>
                                                                         </button>
                                                                         <form action="{{ route('admin.games.removeItem', [$game, $item]) }}" method="POST" class="d-inline">
@@ -224,7 +240,7 @@
                     <h5 class="modal-title">Add New Item Type</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.tipe-items.store') }}" method="POST">
+                <form action="{{ route('admin.tipe-items.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -240,6 +256,15 @@
                             <textarea class="form-control @error('description') is-invalid @enderror" 
                                       id="tipeItemDesc" name="description" rows="3"></textarea>
                             @error('description')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipeItemImage" class="form-label">Image/Icon</label>
+                            <input type="file" class="form-control @error('image') is-invalid @enderror" 
+                                   id="tipeItemImage" name="image" accept="image/*">
+                            <small class="text-muted">Upload gambar atau icon untuk tipe item (JPG, PNG, GIF)</small>
+                            @error('image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -261,7 +286,7 @@
                     <h5 class="modal-title">Edit Item Type</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="editTipeItemForm" method="POST">
+                <form id="editTipeItemForm" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
@@ -272,6 +297,12 @@
                         <div class="mb-3">
                             <label for="editTipeItemDesc" class="form-label">Description</label>
                             <textarea class="form-control" id="editTipeItemDesc" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTipeItemImage" class="form-label">Image/Icon</label>
+                            <div id="editTipeItemImagePreview" class="mb-2"></div>
+                            <input type="file" class="form-control" id="editTipeItemImage" name="image" accept="image/*">
+                            <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -347,11 +378,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="mb-3">
-                            <label for="itemImage" class="form-label">Item Image</label>
-                            <input type="file" class="form-control" id="itemImage" name="image" accept="image/*">
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -423,13 +449,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="mb-3">
-                            <label for="editItemImage" class="form-label">Item Image</label>
-                            <div id="editItemImagePreview" class="mb-2"></div>
-                            <input type="file" class="form-control" id="editItemImage" name="image" accept="image/*">
-                            <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -441,14 +460,29 @@
     </div>
 
     <script>
-        function editTipeItem(id, name, description) {
-            const form = document.getElementById('editTipeItemForm');
-            form.action = '/admin/tipe-items/' + id;
-            document.getElementById('editTipeItemName').value = name;
-            document.getElementById('editTipeItemDesc').value = description;
-        }
+        // Handle edit tipe item button clicks
+        document.querySelectorAll('.edit-tipe-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+                const description = this.dataset.description;
+                const image = this.dataset.image;
+                
+                const form = document.getElementById('editTipeItemForm');
+                form.action = '/admin/tipe-items/' + id;
+                document.getElementById('editTipeItemName').value = name;
+                document.getElementById('editTipeItemDesc').value = description;
+                
+                const previewDiv = document.getElementById('editTipeItemImagePreview');
+                if (image && image.trim() !== '') {
+                    previewDiv.innerHTML = '<img src="/public/' + image + '" style="max-width: 100px; max-height: 100px; border-radius: 4px;">';
+                } else {
+                    previewDiv.innerHTML = '';
+                }
+            });
+        });
 
-        function prepareEditItemModal(gameId, itemId, nama, itemCode, tipeItemId, harga, hargaCoret, discountPercent, image) {
+        function prepareEditItemModal(gameId, itemId, nama, itemCode, tipeItemId, harga, hargaCoret, discountPercent) {
             const form = document.getElementById('editItemForm');
             form.action = '/admin/games/' + gameId + '/items/' + itemId;
             
@@ -459,13 +493,6 @@
             document.getElementById('editItemHarga').value = harga;
             document.getElementById('editItemHargaCoret').value = hargaCoret;
             document.getElementById('editItemDiscount').value = discountPercent;
-            
-            const previewDiv = document.getElementById('editItemImagePreview');
-            if (image) {
-                previewDiv.innerHTML = '<img src="/storage/' + image + '" style="max-width: 100px; max-height: 100px; border-radius: 4px;">';
-            } else {
-                previewDiv.innerHTML = '';
-            }
         }
 
     </script>
