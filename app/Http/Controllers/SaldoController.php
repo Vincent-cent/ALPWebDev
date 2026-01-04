@@ -65,6 +65,9 @@ class SaldoController extends Controller
                 \Midtrans\Config::$isProduction = config('midtrans.is_production');
                 \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
                 \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+                
+                // Disable SSL verification for local development
+                \Midtrans\Config::$curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
 
                 // Create Midtrans transaction payload
                 $payload = [
@@ -103,20 +106,45 @@ class SaldoController extends Controller
                         'order_id' => $orderId,
                         'amount' => $amount,
                         'total' => $total,
-                        'payload' => $payload
+                        'payload' => $payload,
+                        'config' => [
+                            'server_key' => config('midtrans.server_key') ? 'SET' : 'NOT SET',
+                            'is_production' => config('midtrans.is_production')
+                        ]
                     ]);
                     
+                    // Suppress PHP warnings during Midtrans call
+                    $oldErrorReporting = error_reporting(E_ERROR | E_PARSE);
+                    
                     $snapToken = \Midtrans\Snap::getSnapToken($payload);
+                    
+                    // Restore original error reporting
+                    error_reporting($oldErrorReporting);
+                    
                     $transaksi->update([
                         'midtrans_transaction_id' => $snapToken,
                     ]);
+
+                    Log::info('Midtrans Snap token created successfully for saldo top-up');
 
                     return redirect()->route('saldo.payment', $transaksi->id)
                         ->with('success', 'Top-up request created successfully!');
                         
                 } catch (\Exception $e) {
-                    Log::error('Midtrans error: ' . $e->getMessage());
-                    return back()->with('error', 'Failed to create payment. Please try again.')
+                    if (isset($oldErrorReporting)) {
+                        error_reporting($oldErrorReporting);
+                    }
+                    Log::error('Midtrans error details:', [
+                        'message' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                        'payload' => $payload,
+                        'config' => [
+                            'server_key' => config('midtrans.server_key') ? 'SET' : 'NOT SET',
+                            'is_production' => config('midtrans.is_production')
+                        ]
+                    ]);
+                    return back()->with('error', 'Failed to create payment: ' . $e->getMessage())
                         ->withInput();
                 }
             });
@@ -151,7 +179,113 @@ class SaldoController extends Controller
             abort(403, 'Unauthorized access to transaction');
         }
 
+        // Check and update saldo if payment is already completed but callback hasn't been processed
+        if (!$transaksi->paid_at) {
+            $this->checkAndProcessPayment($transaksi);
+        }
+
         return view('portal.user.saldo.success', compact('transaksi'));
+    }
+
+    /**
+     * Check payment status from Midtrans and process if successful
+     */
+    private function checkAndProcessPayment(Transaksi $transaksi)
+    {
+        try {
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production');
+
+            Log::info('Checking payment status from Midtrans', [
+                'order_id' => $transaksi->midtrans_order_id
+            ]);
+
+            // Get transaction status from Midtrans
+            $status = \Midtrans\Transaction::status($transaksi->midtrans_order_id);
+
+            Log::info('Midtrans status response', [
+                'order_id' => $transaksi->midtrans_order_id,
+                'transaction_status' => $status->transaction_status ?? null,
+                'fraud_status' => $status->fraud_status ?? null
+            ]);
+
+            // If payment is successful, add to saldo
+            if (isset($status->transaction_status)) {
+                $transactionStatus = $status->transaction_status;
+                
+                if (in_array($transactionStatus, ['settlement', 'capture'])) {
+                    Log::info('Payment verified as successful, updating saldo', [
+                        'order_id' => $transaksi->midtrans_order_id,
+                        'user_id' => $transaksi->user_id
+                    ]);
+
+                    $saldo = $transaksi->user->getOrCreateSaldo();
+                    $topupAmount = $transaksi->items->first()->price;
+                    $saldo->addBalance($topupAmount);
+                    
+                    Log::info('Saldo balance updated from success page check', [
+                        'user_id' => $transaksi->user_id,
+                        'amount_added' => $topupAmount,
+                        'new_balance' => $saldo->amount,
+                        'status' => $transactionStatus
+                    ]);
+
+                    $transaksi->update([
+                        'paid_at' => now(),
+                        'midtrans_status' => $transactionStatus,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning('Error checking payment status from Midtrans', [
+                'order_id' => $transaksi->midtrans_order_id,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Manually check and process payment status (API endpoint)
+     */
+    public function checkStatus($id)
+    {
+        try {
+            $transaksi = Transaksi::findOrFail($id);
+
+            // Verify ownership
+            if ($transaksi->user_id !== auth()->id()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+
+            // If already paid, no need to check
+            if ($transaksi->paid_at) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Payment already confirmed',
+                    'paid_at' => $transaksi->paid_at,
+                    'saldo' => auth()->user()->getSaldoAmount()
+                ]);
+            }
+
+            // Check and process payment
+            $this->checkAndProcessPayment($transaksi);
+
+            // Refresh the transaksi instance to get updated data
+            $transaksi->refresh();
+
+            return response()->json([
+                'success' => true,
+                'message' => $transaksi->paid_at ? 'Payment confirmed and saldo updated' : 'Payment still pending',
+                'paid_at' => $transaksi->paid_at,
+                'saldo' => auth()->user()->getSaldoAmount()
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in checkStatus: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking payment status'
+            ], 500);
+        }
     }
 
     public function callback(Request $request)
@@ -183,17 +317,15 @@ class SaldoController extends Controller
                     if (in_array($transactionStatus, ['settlement', 'capture', 'cancel'])) {
                         // Payment successful - add to saldo (temporarily treating 'cancel' as success)
                         if (!$transaksi->paid_at) {
-                            $saldo = $transaksi->user->saldo;
-                            if ($saldo) {
-                                $topupAmount = $transaksi->items->first()->price;
-                                $saldo->addBalance($topupAmount);
-                                Log::info('Saldo balance updated', [
-                                    'user_id' => $transaksi->user_id,
-                                    'amount_added' => $topupAmount,
-                                    'new_balance' => $saldo->amount,
-                                    'status' => $transactionStatus
-                                ]);
-                            }
+                            $saldo = $transaksi->user->getOrCreateSaldo();
+                            $topupAmount = $transaksi->items->first()->price;
+                            $saldo->addBalance($topupAmount);
+                            Log::info('Saldo balance updated', [
+                                'user_id' => $transaksi->user_id,
+                                'amount_added' => $topupAmount,
+                                'new_balance' => $saldo->amount,
+                                'status' => $transactionStatus
+                            ]);
                             
                             $transaksi->update([
                                 'paid_at' => now(),

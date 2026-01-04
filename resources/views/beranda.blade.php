@@ -14,9 +14,7 @@
                                 <div class="d-flex align-items-center justify-content-center position-relative h-100">
                                     @foreach ($banners as $index => $banner)
                                         @php
-                                            $bannerImage = $banner->image && file_exists(public_path($banner->image))
-                                                ? asset($banner->image)
-                                                : asset('/placeholder.jpg');
+                                            $bannerImage = getImageUrl($banner->image, 'banner');
                                         @endphp
                                         <div class="banner-slide position-absolute {{ $index == 0 ? 'active center' : ($index == 1 ? 'right' : 'hidden') }}" 
                                              data-index="{{ $index }}"
@@ -78,9 +76,7 @@
                                         <div class="card-body p-3 text-center">
                                             <div class="position-relative mb-2">
                                                 @php
-                                                    $imagePath = $game->image && file_exists(public_path($game->image))
-                                                        ? asset($game->image)
-                                                        : asset('/placeholder.jpg');
+                                                    $imagePath = getImageUrl($game->image, 'game');
                                                 @endphp
                                                 <img src="{{ $imagePath }}" alt="{{ $game->name }}"
                                                     class="img-fluid rounded-3"
@@ -125,11 +121,7 @@
                                         style="background: #2a3150; border-radius: 15px;">
                                         <div class="card-body p-3 text-center">
                                             @php
-
-                                            
-                                            $voucherImage = $voucher->image && file_exists(public_path($voucher->image))
-                                                    ? asset($voucher->image)
-                                                    : asset('/placeholder.jpg');
+                                                $voucherImage = getImageUrl($voucher->image, 'game');
                                             @endphp
                                             <img src="{{ $voucherImage }}"
                                                 alt="{{ $voucher->name }}" class="img-fluid rounded-3 mb-2"

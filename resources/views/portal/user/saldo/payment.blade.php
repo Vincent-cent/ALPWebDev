@@ -76,6 +76,13 @@
                                 Your payment is secured by Midtrans
                             </small>
                         </p>
+                        <hr>
+                        <p>
+                            <small class="text-muted">Sudah membayar?</small><br>
+                            <button type="button" id="check-payment-btn" class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="fas fa-sync-alt me-1"></i>Check Payment Status
+                            </button>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -99,4 +106,43 @@
 @section('scripts')
     <!-- Transaction Payment JavaScript -->
     <script src="{{ asset('js/transaction-payment.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkPaymentBtn = document.getElementById('check-payment-btn');
+            const transactionId = document.querySelector('meta[name="transaction-id"]').getAttribute('content');
+            
+            if (checkPaymentBtn) {
+                checkPaymentBtn.addEventListener('click', function() {
+                    checkPaymentBtn.disabled = true;
+                    checkPaymentBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Checking...';
+                    
+                    fetch('{{ route("saldo.check-status", $transaksi->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.paid_at) {
+                            // Payment confirmed, redirect to success page
+                            window.location.href = '{{ route("saldo.success", $transaksi->id) }}';
+                        } else {
+                            // Payment still pending
+                            alert('Payment is still pending. Please complete the payment process.');
+                            checkPaymentBtn.disabled = false;
+                            checkPaymentBtn.innerHTML = '<i class="fas fa-sync-alt me-1"></i>Check Payment Status';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error checking payment status');
+                        checkPaymentBtn.disabled = false;
+                        checkPaymentBtn.innerHTML = '<i class="fas fa-sync-alt me-1"></i>Check Payment Status';
+                    });
+                });
+            }
+        });
+    </script>
 @endsection

@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Load helpers
+        require_once app_path('Helpers/ImageHelper.php');
+        
         Gate::define('admin', function ($user) {
             return $user->role === 'admin';
         });

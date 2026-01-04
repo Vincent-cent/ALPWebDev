@@ -88,15 +88,22 @@ class GameTransactionController extends Controller
                 'server_id' => $validated['server_id'] ?? '',
             ]);
             
-            // Send to APIGames
-            $response = Http::post('https://v1.apigames.id/v2/transaksi', [
+            // Send to APIGames with correct signature format (colon separator)
+            $signature = md5($this->apiId.':'.$this->apiKey.':'.$orderId);
+            $payload = [
                 'ref_id'      => $orderId,
                 'merchant_id' => $this->apiId,
-                'produk'      => $productCode,
+                'produk'      => $item->item_id,  // Send product code, not database ID
                 'tujuan'      => $validated['user_id'],
-                'server_id'   => $validated['server_id'] ?? '',
-                'signature'   => md5($this->apiId . ':' . $this->apiKey . ':' . $orderId),
-            ]);
+                'signature'   => $signature,
+            ];
+            
+            // Add server_id if provided
+            if (!empty($validated['server_id'])) {
+                $payload['server_id'] = $validated['server_id'];
+            }
+            
+            $response = Http::post($this->apiUrl, $payload);
             
             $apiResult = $response->json();
             

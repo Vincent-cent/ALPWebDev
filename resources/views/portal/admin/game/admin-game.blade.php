@@ -482,6 +482,22 @@
             });
         });
 
+        function prepareAddItemModal(gameId, gameName) {
+            const form = document.getElementById('addItemForm');
+            form.action = '/admin/games/' + gameId + '/items';
+            
+            document.getElementById('gameNameDisplay').textContent = gameName;
+            document.getElementById('gameId').value = gameId;
+            
+            // Reset form fields
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemCode').value = '';
+            document.getElementById('tipeItemId').value = '';
+            document.getElementById('itemHarga').value = '';
+            document.getElementById('itemHargaCoret').value = '';
+            document.getElementById('itemDiscount').value = '0';
+        }
+
         function prepareEditItemModal(gameId, itemId, nama, itemCode, tipeItemId, harga, hargaCoret, discountPercent) {
             const form = document.getElementById('editItemForm');
             form.action = '/admin/games/' + gameId + '/items/' + itemId;

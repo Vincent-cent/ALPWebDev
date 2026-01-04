@@ -14,6 +14,17 @@ use Illuminate\Support\Facades\Http;
 
 class TransaksiController extends Controller
 {
+    private $apiUrl;
+    private $apiKey;
+    private $apiId;
+
+    public function __construct()
+    {
+        $this->apiUrl = env('APIGAMES_API_URL');
+        $this->apiId  = env('APIGAMES_API_ID');
+        $this->apiKey = env('APIGAMES_API_KEY');
+    }
+
     public function show($id)
     {
         $transaksi = Transaksi::with(['items.tipeItem', 'metodePembayaran', 'user'])
@@ -163,6 +174,7 @@ class TransaksiController extends Controller
                 
                 // Create transaksi item
                 $transaksi->items()->create([
+                    'item_id' => $item->id,
                     'tipe_item_id' => $item->tipe_item_id,
                     'quantity' => 1,
                     'price' => $subtotal - $discount,
@@ -205,6 +217,7 @@ class TransaksiController extends Controller
                 
                 // Create transaksi item
                 $transaksi->items()->create([
+                    'item_id' => $item->id,
                     'tipe_item_id' => $item->tipe_item_id,
                     'quantity' => 1,
                     'price' => $subtotal - $discount,
@@ -493,11 +506,9 @@ class TransaksiController extends Controller
             }
 
             // Generate order ID for APIGames
-            $apiOrderId = 'APIGAMES-' . strtoupper(Str::random(10));
-            
-            // Get APIGames credentials from env
-            $apiId = env('APIGAMES_API_ID');
-            $apiKey = env('APIGAMES_API_KEY');
+            $apiOrderId = 'GAME-' . strtoupper(Str::random(10));
+            $signature = md5($this->apiId.':'.$this->apiKey.':'.$apiOrderId);
+            $tujuan = $transaksi->game_user_id;
 
             Log::info('Sending transaksi to APIGames:', [
                 'transaksi_id' => $transaksi->id,
@@ -505,17 +516,30 @@ class TransaksiController extends Controller
                 'game_server_id' => $transaksi->game_server_id,
                 'item_id' => $item->item_id,
                 'api_order_id' => $apiOrderId,
+                'signature_data' => [
+                    'apiId' => $this->apiId,
+                    'apiKey' => substr($this->apiKey, 0, 10) . '...',
+                    'apiOrderId' => $apiOrderId,
+                    'signature' => $signature,
+                    'tujuan' => $tujuan,
+                ]
             ]);
 
-            // Send to APIGames
-            $response = Http::post('https://v1.apigames.id/v2/transaksi', [
+            // Send to APIGames with correct signature format (colon separator)
+            $payload = [
                 'ref_id'      => $apiOrderId,
-                'merchant_id' => $apiId,
-                'produk'      => $item->item_id, // APIGames product code
-                'tujuan'      => $transaksi->game_user_id,
-                'server_id'   => $transaksi->game_server_id ?? '',
-                'signature'   => md5($apiId.':'.$apiKey.':'.$apiOrderId),
-            ]);
+                'merchant_id' => $this->apiId,
+                'produk'      => $item->item_id,  // Send product code, not database ID
+                'tujuan'      => $tujuan,
+                'signature'   => $signature,
+            ];
+            
+            // Add server_id if available
+            if (!empty($transaksi->game_server_id)) {
+                $payload['server_id'] = $transaksi->game_server_id;
+            }
+            
+            $response = Http::post($this->apiUrl, $payload);
 
             $apiResult = $response->json();
 

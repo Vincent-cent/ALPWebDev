@@ -40,16 +40,18 @@ class TopupController extends Controller
             'status'       => 'pending'
         ]);
 
-$response = Http::asJson()->post(
-    'https://v1.apigames.id/transaksi',
-    [
-        'ref_id'      => $orderId,
-        'merchant_id' => $this->apiId,
-        'produk'      => $validated['diamond'],
-        'tujuan'      => $validated['userid'].'|'.$validated['serverid'],
-        'signature'   => md5($this->apiId.$this->apiKey.$orderId),
-    ]
-);
+        $signature = md5($this->apiId.':'.$this->apiKey.':'.$orderId);
+        
+        $response = Http::post(
+            $this->apiUrl,
+            [
+                'ref_id'      => $orderId,
+                'merchant_id' => $this->apiId,
+                'produk'      => $validated['diamond'],
+                'tujuan'      => $validated['userid'].'|'.$validated['serverid'],
+                'signature'   => $signature,
+            ]
+        );
 
 dd([
     'request_payload' => [

@@ -115,6 +115,34 @@ class GameController extends Controller
         return redirect()->route('admin.games.index')->with('success', 'Item berhasil ditambah ke game');
     }
 
+    public function updateItem(Request $request, Game $game, Item $item)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'tipe_item_id' => 'required|exists:tipe_items,id',
+            'harga' => 'required|numeric|min:0',
+            'harga_coret' => 'nullable|numeric|min:0',
+            'discount_percent' => 'nullable|integer|min:0|max:100',
+            'item_id' => 'nullable|string|max:255',
+            'tipe' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($item->image) {
+                Storage::disk('public')->delete($item->image);
+            }
+            $validated['image'] = $request->file('image')->store('items', 'public');
+        }
+
+        // Update item
+        $item->update($validated);
+
+        return redirect()->route('admin.games.index')->with('success', 'Item berhasil diupdate');
+    }
+
     public function updateItemQuantity(Request $request, Game $game, Item $item)
     {
         $validated = $request->validate([

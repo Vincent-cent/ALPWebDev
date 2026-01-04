@@ -30,7 +30,11 @@
                                     </div>
                                     <div class="mb-2">
                                         <strong>Status:</strong><br>
-                                        <span class="badge bg-success">Completed</span>
+                                        @if($transaksi->paid_at)
+                                            <span class="badge bg-success">Completed</span>
+                                        @else
+                                            <span class="badge bg-warning">Pending Payment</span>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -75,4 +79,51 @@
         </div>
     </div>
 </div>
+
+@if(!$transaksi->paid_at)
+<script>
+    // If payment is not confirmed, auto-check status
+    document.addEventListener('DOMContentLoaded', function() {
+        let checkAttempts = 0;
+        const maxAttempts = 6; // Check for 30 seconds (6 x 5 seconds)
+        
+        function checkPaymentStatus() {
+            if (checkAttempts >= maxAttempts) {
+                console.log('Max check attempts reached');
+                return;
+            }
+            
+            checkAttempts++;
+            
+            fetch('{{ route("saldo.check-status", $transaksi->id) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.paid_at) {
+                    // Payment confirmed, reload page to show updated status
+                    console.log('Payment confirmed, reloading page');
+                    window.location.reload();
+                } else {
+                    // Schedule next check
+                    setTimeout(checkPaymentStatus, 5000);
+                }
+            })
+            .catch(error => {
+                console.error('Error checking payment:', error);
+                // Continue checking even if there's an error
+                setTimeout(checkPaymentStatus, 5000);
+            });
+        }
+        
+        // Start checking after 2 seconds
+        setTimeout(checkPaymentStatus, 2000);
+    });
+</script>
+@endif
+
 @endsection

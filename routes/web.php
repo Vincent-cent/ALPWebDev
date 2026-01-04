@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/saldo/topup', [App\Http\Controllers\SaldoController::class, 'topup'])->name('saldo.topup');
     Route::get('/saldo/payment/{id}', [App\Http\Controllers\SaldoController::class, 'payment'])->name('saldo.payment');
     Route::get('/saldo/success/{id}', [App\Http\Controllers\SaldoController::class, 'success'])->name('saldo.success');
+    Route::post('/saldo/check-status/{id}', [App\Http\Controllers\SaldoController::class, 'checkStatus'])->name('saldo.check-status');
 });
 
 // Notifikasi Routes
@@ -97,9 +98,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/games/{game}', [AdminGameController::class, 'update'])->name('games.update');
     Route::delete('/games/{game}', [AdminGameController::class, 'destroy'])->name('games.destroy');
     Route::post('/games/{game}/items', [AdminGameController::class, 'addItem'])->name('games.addItem');
-    Route::put('/games/{game}/items/{item}/quantity', [AdminGameController::class, 'updateItemQuantity'])->name('games.updateItemQuantity');
-    Route::delete('/games/{game}/items/{item}', [AdminGameController::class, 'removeItem'])->name('games.removeItem');
-    Route::post('/games/{game}/items', [AdminGameController::class, 'addItem'])->name('games.addItem');
+    Route::put('/games/{game}/items/{item}', [AdminGameController::class, 'updateItem'])->name('games.updateItem');
     Route::put('/games/{game}/items/{item}/quantity', [AdminGameController::class, 'updateItemQuantity'])->name('games.updateItemQuantity');
     Route::delete('/games/{game}/items/{item}', [AdminGameController::class, 'removeItem'])->name('games.removeItem');
 
