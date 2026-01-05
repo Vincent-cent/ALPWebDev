@@ -12,7 +12,9 @@ class NotifikasiController extends Controller
      */
     public function index(): View
     {
-        $notifikasi = PromoNotifikasi::orderBy('created_at', 'desc')
+        $notifikasi = PromoNotifikasi::with('promoCode')
+            ->where('is_active', true)
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('notifikasi.index', compact('notifikasi'));

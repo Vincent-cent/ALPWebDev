@@ -107,8 +107,8 @@ class ItemSeeder extends Seeder
 
         if ($freeFire && $diamond) {
             $ffItems = [
-                ['nama' => '50 Diamond', 'harga' => 7000, 'harga_coret' => 8500, 'discount_percent' => 18],
-                ['nama' => '140 Diamond', 'harga' => 19000, 'harga_coret' => 23000, 'discount_percent' => 17],
+                ['nama' => '50 Diamond', 'item_id' => 'FF55', 'harga' => 7000, 'harga_coret' => 8500, 'discount_percent' => 18],
+                ['nama' => '60 Diamond', 'item_id' => 'FF60', 'harga' => 19000, 'harga_coret' => 23000, 'discount_percent' => 17],
             ];
 
             foreach ($ffItems as $item) {

@@ -37,6 +37,15 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control @error('content') is-invalid @enderror" 
+                                      id="content" name="content" rows="3">{{ old('content', $notification->content) }}</textarea>
+                            @error('content')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         
                         <div class="mb-3">
                             <label for="promo_code_id" class="form-label">Related Promo Code</label>
@@ -52,6 +61,44 @@
                             @error('promo_code_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-select @error('priority') is-invalid @enderror" 
+                                        id="priority" name="priority">
+                                    <option value="low" {{ old('priority', $notification->priority) === 'low' ? 'selected' : '' }}>Low</option>
+                                    <option value="medium" {{ old('priority', $notification->priority) === 'medium' ? 'selected' : '' }}>Medium</option>
+                                    <option value="high" {{ old('priority', $notification->priority) === 'high' ? 'selected' : '' }}>High</option>
+                                </select>
+                                @error('priority')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="type" class="form-label">Type</label>
+                                <select class="form-select @error('type') is-invalid @enderror" 
+                                        id="type" name="type">
+                                    <option value="general" {{ old('type', $notification->type) === 'general' ? 'selected' : '' }}>General</option>
+                                    <option value="promo" {{ old('type', $notification->type) === 'promo' ? 'selected' : '' }}>Promo</option>
+                                    <option value="alert" {{ old('type', $notification->type) === 'alert' ? 'selected' : '' }}>Alert</option>
+                                </select>
+                                @error('type')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" 
+                                       {{ old('is_active', $notification->is_active) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_active">
+                                    Active
+                                </label>
+                            </div>
                         </div>
                         
                         <div class="mb-3">

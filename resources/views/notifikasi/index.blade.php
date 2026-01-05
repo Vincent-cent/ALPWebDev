@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.mainLayout')
 
 @section('content')
 <div class="container mt-5 pt-5">
@@ -22,7 +22,7 @@
                                                 <img src="{{ asset('storage/' . $item->image) }}" alt="Promo" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
                                             </div>
                                         @endif
-                                        <div class="@if($item->image)col-md@else col-12@endif">
+                                        <div class="@if($item->image)col-md@else col-12 @endif">
                                             <h5 style="color: #222847; font-weight: 600; margin-bottom: 8px;">{{ $item->title }}</h5>
                                             <p style="color: #666; margin-bottom: 8px;">{{ $item->description }}</p>
                                             @if($item->promoCode)

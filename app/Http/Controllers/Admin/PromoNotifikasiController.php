@@ -27,11 +27,16 @@ class PromoNotifikasiController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'content' => 'nullable|string',
             'promo_code_id' => 'required|exists:promo_codes,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'priority' => 'nullable|in:low,medium,high',
+            'type' => 'nullable|in:general,promo,alert',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        $data = $request->only(['title', 'description', 'promo_code_id']);
+        $data = $request->only(['title', 'description', 'content', 'promo_code_id', 'priority', 'type']);
+        $data['is_active'] = $request->has('is_active') ? true : false;
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('notifications', 'public');
@@ -61,11 +66,16 @@ class PromoNotifikasiController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'content' => 'nullable|string',
             'promo_code_id' => 'required|exists:promo_codes,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'priority' => 'nullable|in:low,medium,high',
+            'type' => 'nullable|in:general,promo,alert',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        $data = $request->only(['title', 'description', 'promo_code_id']);
+        $data = $request->only(['title', 'description', 'content', 'promo_code_id', 'priority', 'type']);
+        $data['is_active'] = $request->has('is_active') ? true : false;
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
