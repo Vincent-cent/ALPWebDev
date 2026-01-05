@@ -32,4 +32,27 @@ class PromoCode extends Model
     {
         return $this->hasMany(PromoNotifikasi::class);
     }
+
+    /**
+     * Check if promo code is valid based on dates and quota
+     */
+    public function isValid()
+    {
+        // Check quota
+        if ($this->kuota <= 0) {
+            return false;
+        }
+
+        // Check start date
+        if ($this->start_at && $this->start_at > now()) {
+            return false;
+        }
+
+        // Check end date
+        if ($this->end_at && $this->end_at < now()) {
+            return false;
+        }
+
+        return true;
+    }
 }

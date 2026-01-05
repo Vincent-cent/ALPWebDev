@@ -5,12 +5,14 @@
 
 class GameDetail {
     constructor() {
+        this.currentPromo = null; // Store current validated promo
         this.init();
     }
 
     init() {
         this.setupEventListeners();
         this.setupFormValidation();
+        this.calculateTotal();
     }
 
     setupEventListeners() {
@@ -35,19 +37,37 @@ class GameDetail {
         const itemRadio = document.querySelector('input[name="item_id"]:checked');
         
         if (itemRadio) {
-            const itemPrice = parseFloat(itemRadio.dataset.price) || 0;
+            let itemPrice = parseFloat(itemRadio.dataset.price) || 0;
+            
+            // Apply promo discount if available
+            let discount = 0;
+            if (this.currentPromo) {
+                if (this.currentPromo.discount_percent) {
+                    discount = itemPrice * (this.currentPromo.discount_percent / 100);
+                } else if (this.currentPromo.discount_amount) {
+                    discount = this.currentPromo.discount_amount;
+                }
+            }
+            
+            const discountedItemPrice = itemPrice - discount;
             
             // Update total for each payment method
             document.querySelectorAll('input[name="metode_pembayaran_id"]').forEach(paymentRadio => {
                 const paymentFee = parseFloat(paymentRadio.dataset.fee) || 0;
-                const total = itemPrice + paymentFee;
+                const total = discountedItemPrice + paymentFee;
                 
                 // Find the total-price span in the same payment method container
                 const paymentLabel = paymentRadio.nextElementSibling; // label element
                 if (paymentLabel) {
                     const totalPriceSpan = paymentLabel.querySelector('.total-price');
                     if (totalPriceSpan) {
-                        totalPriceSpan.textContent = 'Rp. ' + total.toLocaleString('id-ID');
+                        // Show original price with strikethrough if discount applied
+                        if (discount > 0) {
+                            const originalTotal = itemPrice + paymentFee;
+                            totalPriceSpan.innerHTML = `<del>Rp. ${originalTotal.toLocaleString('id-ID')}</del> <span style="color: #28a745; font-weight: 600;">Rp. ${total.toLocaleString('id-ID')}</span>`;
+                        } else {
+                            totalPriceSpan.textContent = 'Rp. ' + total.toLocaleString('id-ID');
+                        }
                     }
                 }
             });
@@ -83,10 +103,39 @@ class GameDetail {
         .then(response => response.json())
         .then(data => {
             if (data.valid) {
-                const message = `Kode Promo Valid! Selamat anda mendapatkan potongan sebesar ${data.discount}% (Maksimal Rp.${data.max_discount.toLocaleString('id-ID')}) dalam pembelian ini!`;
+                // Store promo data
+                this.currentPromo = data;
+                
+                let message = 'Kode Promo Valid! ';
+                
+                if (data.discount_percent) {
+                    message += `Selamat anda mendapatkan potongan sebesar ${data.discount_percent}% dalam pembelian ini!`;
+                } else if (data.discount_amount) {
+                    message += `Selamat anda mendapatkan potongan sebesar Rp${data.discount_amount.toLocaleString('id-ID')} dalam pembelian ini!`;
+                } else {
+                    message += 'Tetapi tidak ada potongan harga yang diberikan.';
+                }
+                
                 this.showPromoMessage(message, 'success');
+                
+                // Add hidden input for promo code and ID if not exists
+                const form = document.getElementById('purchaseForm');
+                if (form) {
+                    let promoInput = form.querySelector('input[name="promo_code"]');
+                    if (!promoInput) {
+                        promoInput = document.createElement('input');
+                        promoInput.type = 'hidden';
+                        promoInput.name = 'promo_code';
+                        form.appendChild(promoInput);
+                    }
+                    promoInput.value = promoCode;
+                }
+                
+                this.calculateTotal(); // Recalculate total with promo
             } else {
+                this.currentPromo = null;
                 this.showPromoMessage(data.message || 'Kode promo tidak valid atau sudah kadaluarsa', 'danger');
+                this.calculateTotal(); // Reset to original price
             }
         })
         .catch(error => {

@@ -118,21 +118,24 @@ class TransaksiController extends Controller
             $discount = 0;
             $promoId = null;
             
-            // Check promo code validity and tipe_item compatibility
+            // Check promo code validity
             if ($request->promo_code) {
                 $promo = PromoCode::where('code', $request->promo_code)
                     ->where('kuota', '>', 0)
-                    ->where('start_at', '<=', now())
-                    ->where('end_at', '>=', now())
-                    ->where('tipe_item_id', $item->tipe_item_id)
                     ->first();
                 
-                if ($promo) {
-                    $discount = min(
-                        ($subtotal * $promo->discount_percent / 100),
-                        $promo->discount_amount ?? PHP_FLOAT_MAX
-                    );
-                    $promoId = $promo->id;
+                // Check if promo code is valid and matches tipe_item (or tipe_item_id is null for all items)
+                if ($promo && $promo->isValid()) {
+                    // Check tipe_item compatibility
+                    if ($promo->tipe_item_id === null || $promo->tipe_item_id == $item->tipe_item_id) {
+                        // Calculate discount based on type
+                        if ($promo->discount_percent) {
+                            $discount = ($subtotal * $promo->discount_percent / 100);
+                        } elseif ($promo->discount_amount) {
+                            $discount = $promo->discount_amount;
+                        }
+                        $promoId = $promo->id;
+                    }
                 }
             }
             
